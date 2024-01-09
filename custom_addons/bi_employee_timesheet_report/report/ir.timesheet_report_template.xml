@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <template id="timesheet_select_report">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <div style="padding-bottom:20px !important;" class="oe_structure" />
+                    <h2 align="center">Timesheet Report</h2><br/>
+                    <div align="center" style="font-size: 15pt">
+                        <t t-if="store_list">
+                           <strong>Timesheet Period</strong>
+                            :
+                            <span t-esc="time_gap" />
+                        </t>
+                    </div>
+                    <br></br>
+                    <div class="page" >
+                        <t t-foreach="store_list" t-as="user">
+                            <div class="col-6" style="font-size: 14pt">
+                                <strong>Employee Name</strong>:
+                                <span t-esc="user['name']"/>
+                            </div>
+                            <br/>
+                            <table class="table table-condensed">
+                                <tbody>
+                                    <tr>
+                                        <th style="width:120px">Date</th>
+                                        <th>Project</th>
+                                        <th>Task</th>
+                                        <th>Description</th>
+                                        <th>Time Spent(Hours)</th>
+                                    </tr>
+                                    <t t-set="timesheets_amount" t-value="0"/>
+                                    <t t-set="amu" t-value="0"/>
+                                    <tr t-foreach="timesheets" t-as="t">
+                                        <t t-if="t['user'] == user['name']">
+                                            <t t-set="total_1" t-value="0"/>
+                                            <t t-set="amu" t-value="0 + t['u_name']"/>
+                                            <t t-set="timesheets_amount" t-value="timesheets_amount + t['duration']"/>
+                                            <td><span t-esc="t['date']" /></td>
+                                            <td><span t-esc="t['project']" /></td>
+                                            <td><span t-esc="t['task']" /></td>
+                                            <td><span t-esc="t['description']" /></td>
+                                            <td><span t-esc="t['duration']" /></td>
+                                        </t>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <div class="col-12" style="font-size: 14pt">
+                                    <t t-if="amu == 1">
+                                         <div class="col-12 text-right" style="font-size: 14pt">
+                                            <strong>Total Spent(Hours)</strong>:
+                                             <span t-esc="timesheets_amount"/>
+                                        </div>
+                                    </t>
+                                    <t t-else="">
+                                        <div class="col-12 text-center" style="font-size: 14pt">
+                                            <strong style="color:red">No Data Was Found For This Employee In Selected Date</strong>
+                                        </div>
+                                    </t>
+
+                            </div>
+                            <br/>
+
+                        </t>
+
+                    </div>
+                </div>
+
+            </t>
+        </t>
+    </template>
+</odoo>
+
+
+

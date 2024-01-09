@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+        <record id="timesheet_report_id" model="ir.actions.report">
+            <field name="name">Timesheet Report Print</field>
+            <field name="model">account.analytic.line</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">bi_employee_timesheet_report.timesheet_select_report</field>
+            <field name="report_file">bi_employee_timesheet_report.timesheet_select_report</field>
+
+            <field name="print_report_name">"Timesheet Report"</field>
+            <field name="binding_type">report</field>
+        </record>
+</odoo>

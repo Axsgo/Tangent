@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+bi_employee_timesheet_report.access_timesheet_select,access_timesheet_select,bi_employee_timesheet_report.model_timesheet_select,base.group_user,1,1,1,1,
+bi_employee_timesheet_report.access_save_ex_report_wizard,access_save_ex_report_wizard,bi_employee_timesheet_report.model_save_ex_report_wizard,base.group_user,1,1,1,1

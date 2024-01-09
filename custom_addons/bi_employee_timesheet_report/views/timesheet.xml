@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem name="Timesheet Report"
+              id="timesheet_report_menu"
+              parent="hr_timesheet.menu_timesheets_reports"
+              action="action_timesheet_select"/>
+</odoo>

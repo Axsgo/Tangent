@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <record id="view_account_analytic_line_calendar" model="ir.ui.view">
+        <field name="name">account.analytic.line.calendar</field>
+        <field name="model">account.analytic.line</field>
+        <field eval="2" name="priority"/>
+        <field name="arch" type="xml">
+	        <calendar date_start="date" date_delay="unit_amount" color="project_id" mode="month" event_open_popup="true" quick_add="False" show_unusual_days="True">
+                <field name="employee_id" avatar_field="image_128" filters="1"/>
+	            <field name="date"/>
+	            <field name="project_id"/>
+	            <field name="unit_amount" string="Duration (Hours)"/>
+                <field name="unit_amount" widget="timesheet_uom" sum="Total"
+                       decoration-danger="unit_amount &gt; 8 or unit_amount &lt; 0"/>
+                <field name="name"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="hr_timesheet.act_hr_timesheet_line" model="ir.actions.act_window">
+        <field name="name">My Timesheets</field>
+        <field name="res_model">account.analytic.line</field>
+        <field name="view_mode">tree,calendar,form,kanban</field>
+        <field name="domain">[('project_id', '!=', False), ('user_id', '=', uid)]</field>
+        <field name="context">{
+            "search_default_week":1,
+        }</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+              (0, 0, {'view_mode': 'calendar', 'view_id': ref('sttl_timesheet_calendar.view_account_analytic_line_calendar')}),
+              (0, 0, {'view_mode': 'tree', 'view_id': ref('hr_timesheet.hr_timesheet_line_tree')}),
+              (0, 0, {'view_mode': 'form', 'view_id': ref('hr_timesheet.hr_timesheet_line_form')}),
+              (0, 0, {'view_mode': 'kanban', 'view_id': ref('hr_timesheet.view_kanban_account_analytic_line')})]"/>
+        <field name="search_view_id" ref="hr_timesheet.hr_timesheet_line_my_timesheet_search"/>
+        <field name="help" type="html">
+          <p class="o_view_nocontent_smiling_face">
+            No activities found. Let's start a new one!
+          </p>
+          <p>
+            Track your working hours by projects every day and invoice this time to your customers.
+          </p>
+        </field>
+    </record>
+
+    <record id="hr_timesheet.timesheet_action_all" model="ir.actions.act_window">
+        <field name="name">All Timesheets</field>
+        <field name="res_model">account.analytic.line</field>
+        <field name="view_mode">tree,calendar,form,pivot,kanban</field>
+        <field name="search_view_id" ref="hr_timesheet.hr_timesheet_line_search"/>
+        <field name="domain">[('project_id', '!=', False)]</field>
+                <field name="view_ids" eval="[(5, 0, 0),
+              (0, 0, {'view_mode': 'calendar', 'view_id': ref('sttl_timesheet_calendar.view_account_analytic_line_calendar')}),
+              (0, 0, {'view_mode': 'tree', 'view_id': ref('hr_timesheet.hr_timesheet_line_tree')}),
+              (0, 0, {'view_mode': 'form', 'view_id': ref('hr_timesheet.hr_timesheet_line_form')}),
+              (0, 0, {'view_mode': 'kanban', 'view_id': ref('hr_timesheet.view_kanban_account_analytic_line')})]"/>
+        <field name="context">{
+            'search_default_week':1,
+        }</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No activities found. Let's start a new one!
+          </p>
+          <p>
+            Track your working hours by projects every day and invoice this time to your customers.
+          </p>
+        </field>
+    </record>
+
+    <record id="sttl_calendar_hr_timesheet_line_form_inherit" model="ir.ui.view">
+        <field name="name">account_analytic_line_form_inherit</field>
+        <field name="model">account.analytic.line</field>
+        <field name="inherit_id" ref="hr_timesheet.hr_timesheet_line_form" />
+        <field name="arch" type="xml">
+            <field name="amount" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+            <xpath expr="//field[@name='unit_amount']" position="before">
+            	<field name="from_date"/>
+            </xpath>
+            <xpath expr="//field[@name='unit_amount']" position="after">
+                <field name="to_date"/>
+            </xpath>
+        </field>
+    </record>
+
+
+    <record id="view_account_analytic_line_tree_hr_timesheet" model="ir.ui.view">
+        <field name="name">account.analytic.line.tree.hr_timesheet</field>
+        <field name="model">account.analytic.line</field>
+        <field name="inherit_id" ref="hr_timesheet.hr_timesheet_line_tree"/>
+        <field name="arch" type="xml">
+            <!-- <field name="task_id" position="after"> -->
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="from_date"/>
+                <field name="to_date"/>
+            </xpath>
+        </field>
+    </record>
+    
+</odoo>

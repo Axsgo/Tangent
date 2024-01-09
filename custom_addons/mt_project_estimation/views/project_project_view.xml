@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+        <record model="ir.ui.view" id="project_est_view_form">
+            <field name="name">project.project.form</field>
+            <field name="model">project.project</field>
+            <field name="inherit_id" ref="project.edit_project" />
+            <field name="arch" type="xml">
+				<xpath expr="//div[@name='options_active']" position="before">
+					<field name="project_no" placeholder="Project Number"/>
+				</xpath>
+                <xpath expr="//page[@name='settings']" position="before">
+                    <page name="details" string="Estimation">
+                        <group>
+                            <group>
+                                <field name="date_start"/>
+                                <field name="date"/>
+                            </group>
+                            <group>
+                                <field name="manual_estimation_hrs"/>
+                            </group>
+                            <group>
+                                <field name="estimation_hrs"/>
+                                <field name="worked_hrs"/>
+                            </group>
+                            <group>
+                                <field name="remaining_hrs"/>
+                                <field name="deviation_hrs"/>
+                            </group>
+                    	</group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+	</data>
+</odoo>
+	

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="time_sheet_select_wizard_view" model="ir.ui.view">
+        <field name="name">time sheet select wizard view</field>
+        <field name="model">timesheet.select</field>
+        <field name="arch" type="xml">
+            <form string="Select Timesheet">
+                        <group>
+                            <group>
+                                <field name="start_date"/>
+                            </group>
+                            <group>
+                                <field name="end_date"/>
+                            </group>
+                        </group>
+                            <group>
+                                <group>
+                                    <field name="employee_ids" widget="many2many_tags"/>
+                                </group>
+                            </group>
+
+                <footer>
+                    <button name="generate_pdf_report" string="Generate PDF" type="object" class="btn-primary"/>
+                    <button name="generate_excel_report" string="Generate Excel" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+
+    <record id="action_timesheet_select" model="ir.actions.act_window">
+            <field name="name">Timesheet Record</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">timesheet.select</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+
+    </record>
+
+</odoo>

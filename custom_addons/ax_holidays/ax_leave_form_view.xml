@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+    	<!-- Form view -->
+        <record id="ax_leave_form_view" model="ir.ui.view">
+            <field name="name">Employee Leave</field>
+            <field name="model">ax.leave</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+				<form string="Employee Leave">
+					<header>
+						<button name="entry_confirm" type="object" string="Apply" class="oe_highlight" states="draft" groups="ax_groups.admin_user_group"/> 
+						<field name="state" widget="statusbar"/>
+					</header>
+					<sheet>
+						<div class="oe_title">
+	                        <h2>
+	                            <field name="employee_id" attrs="{'readonly':[('state','!=','draft')]}" options="{'no_open':True,'no_create':True}"/>
+	                        </h2>
+	                    </div> 
+	                    <group>
+	                    	<group>
+	                    		<field name="holiday_status_id" attrs="{'readonly':[('state','!=','draft')]}" options="{'no_open':True,'no_create':True}" domain="['&amp;', ('virtual_remaining_leaves', '&gt;', 0), '|', ('allocation_type', 'in', ['fixed_allocation', 'no']),'&amp;',('allocation_type', '=', 'fixed'), ('max_leaves', '&gt;', '0')]" context="{'employee_id':employee_id}"/>
+	                    		<label for="from_date" string="Dates"/>
+	                    		<div class="o_row o_row_readonly o_hr_holidays_dates">
+	                    			<span class="oe_inline">From</span>
+	                    			<field name="from_date" widget="daterange" no_label='1' class="oe_inline" options="{'related_end_date': 'to_date'}" attrs="{'readonly':[('state','!=','draft')]}"/>
+	                    			<span class="oe_inline">To</span>
+	                    			<field name="to_date" widget="daterange" no_label='1' class="oe_inline" options="{'related_start_date': 'from_date'}" attrs="{'readonly':[('state','!=','draft')]}"/>
+	                    		</div>
+	                    		<field name="number_of_days" widget="timesheet_uom"/>
+	                    		<field name="name" widget="text"/>
+	                    	</group>
+	                    	<group>
+	                    		<field name="entry_date" readonly='1' invisible='1'/>
+	                    		<field name="user_id" readonly='1' invisible='1'/>
+	                    	</group>
+	                    </group>
+					</sheet>
+					<div class="oe_chatter">
+                       <field name="message_follower_ids" widget="mail_followers"/>
+                       <field name="activity_ids" widget="mail_activity"/>
+                       <field name="message_ids" widget="mail_thread"/>
+                   </div>
+				</form>
+			</field>
+		</record>
+
+		<!-- Tree View -->
+        <record id="ax_leave_tree_view" model="ir.ui.view">
+            <field name="name">Employee Leave</field>
+            <field name="model">ax.leave</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+             <tree string="Employee Leave">
+				<field name="employee_id"/>
+				<field name="holiday_status_id"/>
+				<field name="from_date"/>
+				<field name="to_date"/>
+				<field name="state" widget="badge"/>
+				<field name="company_id" groups="base.group_multi_company" optional='hide'/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="ax_leave_calendar_view" model="ir.ui.view">
+	        <field name="name">Employee Leave</field>
+	        <field name="model">ax.leave</field>
+	        <field name="arch" type="xml">
+	            <calendar date_start="from_date" date_stop="to_date" string="Description" date_delay="number_of_days" mode="month" color="holiday_status_id" event_limit="5" event_open_popup="true" form_view_id="%(ax_holidays.ax_leave_form_view)d" quick_add="False" show_unusual_days="True">
+	            	<field name="employee_id" filters="1"/>
+	            	<field name="holiday_status_id" filters="1"/>
+	            	<field name="number_of_days"/>
+	                <field name="from_date"/>
+	                <field name="to_date"/>
+	                <field name="name"/>
+	                <field name="state"/>
+	            </calendar>
+	        </field>
+	    </record>
+        
+        <!-- Search View Start -->
+	
+		<record id="ax_leave_search_view" model="ir.ui.view">
+			<field name="name">Employee Leave</field>
+			<field name="model">ax.leave</field>
+			<field name="arch" type="xml">
+				<search string="Employee Leave">
+					<field name="employee_id" string="Employee"  filter_domain="[('employee_id','ilike',self)]" />
+					<field name="holiday_status_id" string="Time Off Type"  filter_domain="[('holiday_status_id','ilike',self)]" />
+					<group expand="0" string="Group By...">
+						<filter name="employee" string="Employee" domain="[]" context="{'group_by':'employee_id'}"/> 
+						<filter name="holiday_status" string="Time Off Type" domain="[]" context="{'group_by':'holiday_status_id'}"/> 
+						<filter name="state" string="Status" domain="[]" context="{'group_by':'state'}"/> 
+					</group>
+				</search>
+			</field>
+		</record>
+	
+		<!-- Search View End -->
+
+	    <record id="action_ax_leave" model="ir.actions.act_window">  
+	        <field name="name">Employee Leave</field>
+	        <field name="type">ir.actions.act_window</field>
+	        <field name="res_model">ax.leave</field>
+	        <field name="view_mode">calendar,form,tree</field>
+	        <field name="view_id" ref="ax_leave_calendar_view"></field>
+	        <field name="search_view_id" ref="ax_leave_search_view"/>
+	    </record>
+
+	    <!-- Menuitems -->
+		<menuitem name="Apply Employee Leave" id="pm_leave" parent="hr_holidays.menu_hr_holidays_root" action="action_ax_leave" sequence='0' groups="ax_groups.admin_user_group"/>
+
+	    <!-- Record Rule -->
+		<record id="rule_ax_leave" model="ir.rule">
+	        <field name="name">Employee Leave multi-company</field>
+	        <field name="model_id" ref="model_ax_leave"/>
+	        <field eval="True" name="global"/>
+	        <field name="domain_force">['|',('company_id','=',False),('company_id','in',company_ids)]</field>
+	    </record> 
+	</data>
+</openerp>

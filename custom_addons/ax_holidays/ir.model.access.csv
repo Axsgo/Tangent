@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ax_leave,ax.leave,model_ax_leave,ax_groups.admin_user_group,1,1,1,1
