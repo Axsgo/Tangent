@@ -4,7 +4,7 @@ from odoo import fields, models
 class ProjectProject(models.Model):
     _inherit = 'project.project'
     
-    project_no = fields.Char(string="Project Number")
+    project_no = fields.Char(string="Project Number", required=True)
     manual_estimation_hrs = fields.Float(string="Project Estimation Hours")
     estimation_hrs = fields.Float(compute='_compute_est_wrk_hours', string="Estimation Hours")
     worked_hrs = fields.Float(compute='_compute_est_wrk_hours', string="Worked Hours")
