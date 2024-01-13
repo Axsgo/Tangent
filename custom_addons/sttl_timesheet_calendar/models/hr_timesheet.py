@@ -1,32 +1,69 @@
 # -*- coding: utf-8 -*-
 
 from odoo import api, fields, models, _
-from datetime import datetime, time, timedelta
+from datetime import datetime, time
 import pytz
 from dateutil.rrule import rrule, DAILY
+from odoo.exceptions import UserError
 
 
 class AccountAnalyticLine(models.Model):
     _inherit = 'account.analytic.line'
+    
+    @api.model
+    def default_get(self, field_list):
+        result = super(AccountAnalyticLine, self).default_get(field_list)
+        result['unit_amount'] = 0.0
+        if 'date' in result:
+            employee_id = self.env['hr.employee'].search([('user_id', '=', self.env.user.id)], limit=1).id
+            if self.env['hr.timesheet.submit.line'].search([('employee_id','=',employee_id),('submit_id.from_date','<=',result.get('date')),('submit_id.to_date','>=',result.get('date')),('state','=','lock')]):
+                result['message'] = "You can not create/update timesheet for this date"
+        return result
 
     # hours = fields.Integer("Duration (Hours)")
     # minutes = fields.Integer("Duration (Minutes)")
-    from_date = fields.Datetime("From Date", default=datetime.now())
-    to_date = fields.Datetime("To Date",readonly=True)
+    # from_date = fields.Datetime("From Date", default=datetime.now())
+    # to_date = fields.Datetime("To Date",readonly=True)
+    status_id = fields.Many2one("hr.timesheet.status",'Stages')
+    description = fields.Text('Description')
+    message = fields.Text('Message')
     
-    @api.onchange('unit_amount')
-    def _onchange_unit_amount(self):
-        if self.from_date:
-            self.to_date = self.from_date+timedelta(hours=self.unit_amount)
+    @api.onchange('project_id','unit_amount')
+    def _onchange_project_unit_amount(self):
+        self.name = str(self.project_id.project_no)+' - '+str(self.project_id.name)
+    
+    # @api.onchange('hours','minutes')
+    # def _onchange_time(self):
+    #     hours, minutes = divmod(self.minutes, 60)
+    #     self.unit_amount = self.hours+hours+(minutes/100)
+    
+    # @api.onchange('unit_amount')
+    # def _onchange_unit_amount(self):
+    #     if self.from_date:
+    #         self.to_date = self.from_date+timedelta(hours=self.unit_amount)
 
-    @api.onchange('name')
-    def _onchange_date(self):
-        if self.to_date:
-            self.date = self.to_date.date()
+    # @api.onchange('name')
+    # def _onchange_date(self):
+    #     if self.to_date:
+    #         self.date = self.to_date.date()
             
+    # def write(self, vals):
+    #     if 'unit_amount' in vals:
+    #         vals.update({'to_date': self.from_date+timedelta(hours=self.unit_amount)})
+    #     return super(AccountAnalyticLine, self).write(vals)
+    
+    @api.model_create_multi
+    def create(self, vals_list):
+        lines = super(AccountAnalyticLine, self).create(vals_list)
+        for res in lines:
+            if self.env['hr.timesheet.submit.line'].search([('employee_id','=',res.employee_id.id),('submit_id.from_date','<=',res.date),('submit_id.to_date','>=',res.date),('state','=','lock')]):
+                raise UserError(_("You can not create/update timesheet for this date"))
+        return lines
+
     def write(self, vals):
-        if 'unit_amount' in vals:
-            vals.update({'to_date': self.from_date+timedelta(hours=self.unit_amount)})
+        for rec in self:
+            if self.env['hr.timesheet.submit.line'].search([('employee_id','=',rec.employee_id.id),('submit_id.from_date','<=',rec.date),('submit_id.to_date','>=',rec.date),('state','=','lock')]):
+                raise UserError(_("You can not create/update timesheet for this date"))
         return super(AccountAnalyticLine, self).write(vals)
     
     @api.model
@@ -43,3 +80,4 @@ class AccountAnalyticLine(models.Model):
 
         works = {d[0].date() for d in calendar._work_intervals_batch(dfrom, dto)[False]}
         return {fields.Date.to_string(day.date()): (day.date() not in works) for day in rrule(DAILY, dfrom, until=dto)}
+    

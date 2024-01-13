@@ -10,14 +10,87 @@
                 <field name="employee_id" avatar_field="image_128" filters="1"/>
 	            <field name="date"/>
 	            <field name="project_id"/>
-	            <field name="unit_amount" string="Duration (Hours)"/>
-                <field name="unit_amount" widget="timesheet_uom" sum="Total"
-                       decoration-danger="unit_amount &gt; 8 or unit_amount &lt; 0"/>
-                <field name="name"/>
+	            <field name="status_id"/>
+	            <field name="unit_amount" string="Duration (HH:MM)" widget="float_time"/>
+                <field name="description"/>
             </calendar>
         </field>
     </record>
+    
+    <record id="hr_timesheet.hr_timesheet_line_form" model="ir.ui.view">
+        <field name="name">account_analytic_line_form_inherit</field>
+        <field name="model">account.analytic.line</field>
+        <field name="arch" type="xml">
+			<form string="Analytic Entry">
+                <sheet string="Analytic Entry">
+					<div class="row">
+						<h1>Timesheet date <field name="date" nolabel="1" readonly="1"/></h1>
+					</div>
+					<div class="row" attrs="{'invisible': [('message','=', False)]}">
+						<h4 class="alert alert-danger" role="alert"><field name="message" nolabel="1" readonly="1"/></h4>
+					</div>
+                    <group>
+                        <group>
+                            <field name="project_id" options="{'no_create': True}" required="1" context="{'form_view_ref': 'project.project_project_view_form_simplified',}"/>
+                            <field name="status_id" options="{'no_create': True}"/>
+                            <field name="name" invisible="1"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="amount" invisible="1"/>
+                            <!--<field name="hours"/>
+                            <field name="minutes"/>-->
+                            <field name="task_id" invisible="1" options="{'no_create': True}" widget="task_with_hours" context="{'default_project_id': project_id}" domain="[('project_id', '=', project_id)]"/>
+                            <field name="unit_amount" string="Duration (HH:MM)" widget="float_time" decoration-danger="unit_amount &gt; 24"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <group>
+						<field name="description"/>
+					</group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <!--<record id="sttl_calendar_hr_timesheet_line_form_inherit" model="ir.ui.view">
+        <field name="name">account_analytic_line_form_inherit</field>
+        <field name="model">account.analytic.line</field>
+        <field name="inherit_id" ref="hr_timesheet.hr_timesheet_line_form" />
+        <field name="arch" type="xml">
+			<xpath expr="//form/sheet/group" position="before">
+				<h1>Timesheet date <field name="date" nolabel="1"/></h1>
+			</xpath>
+            <field name="date" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+            <field name="amount" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+            <field name="name" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+            <xpath expr="//field[@name='unit_amount']" position="before">
+            	<field name="from_date"/>
+            	<field name="hours"/>
+            	<field name="minutes"/>
+            	<field name="to_date"/>
+            </xpath>
+        </field>
+    </record>-->
 
+    <!--<record id="view_account_analytic_line_tree_hr_timesheet" model="ir.ui.view">
+        <field name="name">account.analytic.line.tree.hr_timesheet</field>
+        <field name="model">account.analytic.line</field>
+        <field name="inherit_id" ref="hr_timesheet.hr_timesheet_line_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="from_date"/>
+                <field name="to_date"/>
+            </xpath>
+        </field>
+    </record>-->
+    
     <record id="hr_timesheet.act_hr_timesheet_line" model="ir.actions.act_window">
         <field name="name">My Timesheets</field>
         <field name="res_model">account.analytic.line</field>
@@ -65,36 +138,8 @@
           </p>
         </field>
     </record>
-
-    <record id="sttl_calendar_hr_timesheet_line_form_inherit" model="ir.ui.view">
-        <field name="name">account_analytic_line_form_inherit</field>
-        <field name="model">account.analytic.line</field>
-        <field name="inherit_id" ref="hr_timesheet.hr_timesheet_line_form" />
-        <field name="arch" type="xml">
-            <field name="amount" position="attributes">
-                <attribute name="invisible">1</attribute>
-            </field>
-            <xpath expr="//field[@name='unit_amount']" position="before">
-            	<field name="from_date"/>
-            </xpath>
-            <xpath expr="//field[@name='unit_amount']" position="after">
-                <field name="to_date"/>
-            </xpath>
-        </field>
-    </record>
-
-
-    <record id="view_account_analytic_line_tree_hr_timesheet" model="ir.ui.view">
-        <field name="name">account.analytic.line.tree.hr_timesheet</field>
-        <field name="model">account.analytic.line</field>
-        <field name="inherit_id" ref="hr_timesheet.hr_timesheet_line_tree"/>
-        <field name="arch" type="xml">
-            <!-- <field name="task_id" position="after"> -->
-            <xpath expr="//field[@name='name']" position="after">
-                <field name="from_date"/>
-                <field name="to_date"/>
-            </xpath>
-        </field>
-    </record>
     
+    <menuitem id="hr_holidays_resource" action="resource.action_resource_calendar_form"
+        name="Working Times" parent="hr_holidays.menu_hr_holidays_configuration" groups="ax_groups.admin_user_group"/>
+
 </odoo>

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from odoo import fields, models
+from odoo import api, fields, models
 
 class ProjectProject(models.Model):
     _inherit = 'project.project'
@@ -25,4 +25,18 @@ class ProjectProject(models.Model):
         else:
             self.remaining_hrs = est_rem_hrs
             self.deviation_hrs = 0
+            
+    def name_get(self):
+        result = []
+        for project in self:
+            name = project.project_no  + ' - ' + project.name
+            result.append((project.id, name))
+        return result
+    
+    @api.model
+    def _name_search(self, name='', args=None, operator='ilike', limit=100, name_get_uid=None):
+        if args is None:
+            args = []
+        domain = args + ['|', ('project_no', operator, name), ('name', operator, name)]
+        return self._search(domain, limit=limit, access_rights_uid=name_get_uid)
         

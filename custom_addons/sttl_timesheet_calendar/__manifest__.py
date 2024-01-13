@@ -12,11 +12,12 @@
     'price': 00,
     'currency': 'EUR',
     'depends': [
-        'base',
-        'hr_timesheet',
+        'base','resource','hr_timesheet',
     ],
     'data': [
+        'security/ir.model.access.csv',
         'views/hr_timesheet_view.xml',
+        'views/hr_timesheet_submit_view.xml'
     ],
     'installable': True,
     'application': True,
