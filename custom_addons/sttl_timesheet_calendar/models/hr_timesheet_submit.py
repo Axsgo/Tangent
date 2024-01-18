@@ -2,6 +2,10 @@
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
+from datetime import datetime, time
+import pytz
+from dateutil.rrule import rrule, DAILY
+from dateutil.relativedelta import relativedelta
 
 
 class HrTimesheetSubmit(models.Model):
@@ -40,15 +44,25 @@ class HrTimesheetSubmit(models.Model):
         
     def lock(self):
         for rec in self.line_ids:
-            if rec.total_hrs < 45:
-                raise UserError(_("%s worked hours less-then 45, So you can't lock timesheets.")% rec.employee_id.name)
+            leave_days = rec.get_unusual_days(self.from_date,self.to_date)
+            day_count = list(leave_days.values()).count(False)
+            if rec.total_hrs < (day_count*9):
+                raise UserError(_("%s worked hours less-then %s, So you can't submit timesheets.")% rec.employee_id.name,(day_count*9))
             rec.state='lock'
         
     def unlock(self):
         for rec in self.line_ids:
             rec.unlink()
             
-        
+    def monthly_submission_master(self):
+        for i in range(1,6):
+            submit_id = self.env['hr.timesheet.submit'].search([],order='id desc',limit=1)
+            from_date = submit_id.to_date+relativedelta(days=1)
+            to_date = submit_id.to_date+relativedelta(days=7)
+            if from_date.day > 6  or i != 5:
+                self.env['hr.timesheet.submit'].sudo().create({'from_date':from_date,'to_date':to_date})
+            
+
 class HrTimesheetSubmitLine(models.Model):
     _name = "hr.timesheet.submit.line"
     _description = "Submit Timesheet"
@@ -90,8 +104,10 @@ class HrTimesheetSubmitLine(models.Model):
         submit_ids = self.env['hr.timesheet.submit'].search([]).line_ids.filtered(lambda a: a.employee_id.id == lines.employee_id.id and a.state=='lock')
         if submit_ids:
             raise UserError(_("You are already locked this week timesheets."))
-        if lines.total_hrs < 45:
-            raise UserError(_("Your worked hours less-then 45, So you can't lock timesheets."))
+        leave_days = self.get_unusual_days(lines.submit_id.from_date,lines.submit_id.to_date)
+        day_count = list(leave_days.values()).count(False)
+        if lines.total_hrs < (day_count*9):
+            raise UserError(_("Your worked hours less-then %s in this week, So you can't submit timesheets.")% (day_count*9))
         return lines
         
     def lock(self):
@@ -100,10 +116,25 @@ class HrTimesheetSubmitLine(models.Model):
     def unlock(self):
         self.unlink()
         
+    @api.model
+    def get_unusual_days(self, date_from, date_to=None):
+        # Checking the calendar directly allows to not grey out the leaves taken
+        # by the employee
+        calendar = self.env.user.employee_id.resource_calendar_id
+        if not calendar:
+            return {}
+        tz = pytz.timezone('UTC')
+        dfrom = pytz.utc.localize(datetime.combine(fields.Date.from_string(date_from), time.min)).astimezone(tz)
+        dto = pytz.utc.localize(datetime.combine(fields.Date.from_string(date_to), time.max)).astimezone(tz)
+
+        works = {d[0].date() for d in calendar._work_intervals_batch(dfrom, dto)[False]}
+        return {fields.Date.to_string(day.date()): (day.date() not in works) for day in rrule(DAILY, dfrom, until=dto)}
+    
+            
 class HrTimesheetStatus(models.Model):
     _name = "hr.timesheet.status"
     _description = "Timesheet Status"
-    _order = "id asc"
+    _order = "sequence asc"
     
     name = fields.Char('Name', required=True)
     sequence = fields.Integer('Sequence')

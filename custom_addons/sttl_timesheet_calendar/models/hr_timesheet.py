@@ -15,6 +15,8 @@ class AccountAnalyticLine(models.Model):
         result = super(AccountAnalyticLine, self).default_get(field_list)
         result['unit_amount'] = 0.0
         if 'date' in result:
+            if not self.env['hr.timesheet.submit'].search([('from_date','<=',result.get('date')),('to_date','>=',result.get('date'))]):
+                raise UserError(_("You can not create timesheet for future date"))
             employee_id = self.env['hr.employee'].search([('user_id', '=', self.env.user.id)], limit=1).id
             if self.env['hr.timesheet.submit.line'].search([('employee_id','=',employee_id),('submit_id.from_date','<=',result.get('date')),('submit_id.to_date','>=',result.get('date')),('state','=','lock')]):
                 result['message'] = "You can not create/update timesheet for this date"
@@ -24,7 +26,8 @@ class AccountAnalyticLine(models.Model):
     # minutes = fields.Integer("Duration (Minutes)")
     # from_date = fields.Datetime("From Date", default=datetime.now())
     # to_date = fields.Datetime("To Date",readonly=True)
-    status_id = fields.Many2one("hr.timesheet.status",'Stages')
+    # status_id = fields.Many2one("hr.timesheet.status",'Stages')
+    status_id = fields.Many2one("project.task.type",'Stages',order='sequence asc')
     description = fields.Text('Description')
     message = fields.Text('Message')
     
@@ -58,13 +61,20 @@ class AccountAnalyticLine(models.Model):
         for res in lines:
             if self.env['hr.timesheet.submit.line'].search([('employee_id','=',res.employee_id.id),('submit_id.from_date','<=',res.date),('submit_id.to_date','>=',res.date),('state','=','lock')]):
                 raise UserError(_("You can not create/update timesheet for this date"))
+            if res.unit_amount <= 0:
+                raise UserError(_("You can not update zero duration timesheet"))
+            res.project_id.stage_id = res.status_id.id
         return lines
 
     def write(self, vals):
         for rec in self:
             if self.env['hr.timesheet.submit.line'].search([('employee_id','=',rec.employee_id.id),('submit_id.from_date','<=',rec.date),('submit_id.to_date','>=',rec.date),('state','=','lock')]):
                 raise UserError(_("You can not create/update timesheet for this date"))
-        return super(AccountAnalyticLine, self).write(vals)
+        res = super(AccountAnalyticLine, self).write(vals)
+        rec.project_id.stage_id = rec.status_id.id
+        if rec.unit_amount <= 0:
+            raise UserError(_("You can not update zero duration timesheet"))
+        return res
     
     @api.model
     def get_unusual_days(self, date_from, date_to=None):
@@ -74,7 +84,6 @@ class AccountAnalyticLine(models.Model):
         if not calendar:
             return {}
         tz = pytz.timezone('UTC')
-        usertime = pytz.utc.localize(datetime.now()).astimezone(tz)
         dfrom = pytz.utc.localize(datetime.combine(fields.Date.from_string(date_from), time.min)).astimezone(tz)
         dto = pytz.utc.localize(datetime.combine(fields.Date.from_string(date_to), time.max)).astimezone(tz)
 

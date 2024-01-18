@@ -1,5 +1,5 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_hr_timesheet_submit,hr.timesheet.submit,model_hr_timesheet_submit,ax_groups.admin_user_group,1,1,1,1
+access_hr_timesheet_submit,hr.timesheet.submit,model_hr_timesheet_submit,ax_groups.admin_user_group,1,1,0,0
 access_hr_timesheet_submit_line,hr.timesheet.submit.line,model_hr_timesheet_submit_line,ax_groups.admin_user_group,1,1,1,1
 access_hr_timesheet_submit_line_emp,hr.timesheet.submit.line,model_hr_timesheet_submit_line,base.group_user,1,1,1,0
 access_resource_calendar_admin,resource.calendar,resource.model_resource_calendar,ax_groups.admin_user_group,1,1,1,1

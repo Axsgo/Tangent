@@ -15,9 +15,11 @@
         'base','resource','hr_timesheet',
     ],
     'data': [
+        'data/timesheet_submission_scheduler.xml',
         'security/ir.model.access.csv',
         'views/hr_timesheet_view.xml',
-        'views/hr_timesheet_submit_view.xml'
+        'views/hr_timesheet_submit_view.xml',
+        'views/project_project_view.xml'
     ],
     'installable': True,
     'application': True,

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+        <record model="ir.ui.view" id="project_stage_view_form">
+            <field name="name">project.project.form</field>
+            <field name="model">project.project</field>
+            <field name="inherit_id" ref="project.edit_project" />
+            <field name="arch" type="xml">
+				<xpath expr="//header/button" position="after">
+					<field name="stage_id" widget="statusbar" options="{'clickable': '0', 'fold_field': 'fold'}"/>
+				</xpath>
+            </field>
+        </record>
+	</data>
+</odoo>
+	
