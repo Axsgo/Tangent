@@ -29,7 +29,10 @@ class ProjectProject(models.Model):
     def name_get(self):
         result = []
         for project in self:
-            name = project.project_no  + ' - ' + project.name
+            if project.project_no:
+                name = project.project_no  + ' - ' + project.name
+            else:
+                name = project.name
             result.append((project.id, name))
         return result
     
