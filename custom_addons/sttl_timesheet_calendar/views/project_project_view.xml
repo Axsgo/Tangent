@@ -7,7 +7,7 @@
             <field name="inherit_id" ref="project.edit_project" />
             <field name="arch" type="xml">
 				<xpath expr="//header/button" position="after">
-					<field name="stage_id" widget="statusbar" options="{'clickable': '0', 'fold_field': 'fold'}"/>
+					<field name="stage_id" widget="statusbar" options="{'clickable': '0'}"/>
 				</xpath>
             </field>
         </record>

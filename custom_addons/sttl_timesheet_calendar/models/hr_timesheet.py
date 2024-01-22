@@ -26,8 +26,8 @@ class AccountAnalyticLine(models.Model):
     # minutes = fields.Integer("Duration (Minutes)")
     # from_date = fields.Datetime("From Date", default=datetime.now())
     # to_date = fields.Datetime("To Date",readonly=True)
-    # status_id = fields.Many2one("hr.timesheet.status",'Stages')
-    status_id = fields.Many2one("project.task.type",'Stages',order='sequence asc')
+    status_id = fields.Many2one("hr.timesheet.status",'Stages',order='sequence asc')
+    # status_id = fields.Many2one("project.task.type",'Stages',order='sequence asc')
     description = fields.Text('Description')
     message = fields.Text('Message')
     

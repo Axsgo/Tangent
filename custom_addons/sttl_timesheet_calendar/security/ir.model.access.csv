@@ -6,3 +6,5 @@ access_hr_timesheet_submit_line_emp,hr.timesheet.submit.line,model_hr_timesheet_
 access_resource_calendar_admin,resource.calendar,resource.model_resource_calendar,ax_groups.admin_user_group,1,1,1,1
 access_resource_calendar_attendance_admin,resource.calendar.attendance,resource.model_resource_calendar_attendance,ax_groups.admin_user_group,1,1,1,1
 access_hr_timesheet_status,hr.timesheet.status,model_hr_timesheet_status,ax_groups.admin_user_group,1,1,1,1
+access_hr_timesheet_status_emp,hr.timesheet.status,model_hr_timesheet_status,base.group_user,1,0,0,0
+hr_timesheet.access_project_project,project.project.timesheet.user,hr_timesheet.model_project_project,hr_timesheet.group_hr_timesheet_user,1,1,0,0
