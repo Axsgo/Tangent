@@ -21,12 +21,19 @@ class AccountAnalyticLine(models.Model):
             if self.env['hr.timesheet.submit.line'].search([('employee_id','=',employee_id),('submit_id.from_date','<=',result.get('date')),('submit_id.to_date','>=',result.get('date')),('state','=','lock')]):
                 result['message'] = "You can not create/update timesheet for this date"
         return result
+    
+    def _domain_stages(self):
+        if self.user_has_groups('ax_groups.admin_user_group'):
+            return [('for_admin', '=', True)]
+        else:
+            return [('for_admin', '!=', True)]
+        return []
 
     # hours = fields.Integer("Duration (Hours)")
     # minutes = fields.Integer("Duration (Minutes)")
     # from_date = fields.Datetime("From Date", default=datetime.now())
     # to_date = fields.Datetime("To Date",readonly=True)
-    status_id = fields.Many2one("hr.timesheet.status",'Stages',order='sequence asc')
+    status_id = fields.Many2one("hr.timesheet.status",'Stages',order='sequence asc', domain=_domain_stages)
     # status_id = fields.Many2one("project.task.type",'Stages',order='sequence asc')
     description = fields.Text('Description')
     message = fields.Text('Message')

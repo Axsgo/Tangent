@@ -8,3 +8,4 @@ access_resource_calendar_attendance_admin,resource.calendar.attendance,resource.
 access_hr_timesheet_status,hr.timesheet.status,model_hr_timesheet_status,ax_groups.admin_user_group,1,1,1,1
 access_hr_timesheet_status_emp,hr.timesheet.status,model_hr_timesheet_status,base.group_user,1,0,0,0
 hr_timesheet.access_project_project,project.project.timesheet.user,hr_timesheet.model_project_project,hr_timesheet.group_hr_timesheet_user,1,1,0,0
+project.access_project_task,project.task,project.model_project_task,project.group_project_user,1,1,0,0

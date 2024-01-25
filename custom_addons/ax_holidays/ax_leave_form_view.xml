@@ -20,7 +20,7 @@
 	                    </div> 
 	                    <group>
 	                    	<group>
-	                    		<field name="holiday_status_id" attrs="{'readonly':[('state','!=','draft')]}" options="{'no_open':True,'no_create':True}" domain="['&amp;', ('virtual_remaining_leaves', '&gt;', 0), '|', ('allocation_type', 'in', ['fixed_allocation', 'no']),'&amp;',('allocation_type', '=', 'fixed'), ('max_leaves', '&gt;', '0')]" context="{'employee_id':employee_id}"/>
+	                    		<!--<field name="holiday_status_id" attrs="{'readonly':[('state','!=','draft')]}" options="{'no_open':True,'no_create':True}" domain="['&amp;', ('virtual_remaining_leaves', '&gt;', 0), '|', ('allocation_type', 'in', ['fixed_allocation', 'no']),'&amp;',('allocation_type', '=', 'fixed'), ('max_leaves', '&gt;', '0')]" context="{'employee_id':employee_id}"/>-->
 	                    		<label for="from_date" string="Dates"/>
 	                    		<div class="o_row o_row_readonly o_hr_holidays_dates">
 	                    			<span class="oe_inline">From</span>
@@ -29,7 +29,7 @@
 	                    			<field name="to_date" widget="daterange" no_label='1' class="oe_inline" options="{'related_start_date': 'from_date'}" attrs="{'readonly':[('state','!=','draft')]}"/>
 	                    		</div>
 	                    		<field name="number_of_days" widget="timesheet_uom"/>
-	                    		<field name="name" widget="text"/>
+	                    		<field name="description" widget="text"/>
 	                    	</group>
 	                    	<group>
 	                    		<field name="entry_date" readonly='1' invisible='1'/>
@@ -54,7 +54,7 @@
             <field name="arch" type="xml">
              <tree string="Employee Leave">
 				<field name="employee_id"/>
-				<field name="holiday_status_id"/>
+				<!--<field name="holiday_status_id"/>-->
 				<field name="from_date"/>
 				<field name="to_date"/>
 				<field name="state" widget="badge"/>
@@ -67,13 +67,13 @@
 	        <field name="name">Employee Leave</field>
 	        <field name="model">ax.leave</field>
 	        <field name="arch" type="xml">
-	            <calendar date_start="from_date" date_stop="to_date" string="Description" date_delay="number_of_days" mode="month" color="holiday_status_id" event_limit="5" event_open_popup="true" form_view_id="%(ax_holidays.ax_leave_form_view)d" quick_add="False" show_unusual_days="True">
+	            <calendar date_start="from_date" date_stop="to_date" color="employee_id" string="Description" date_delay="number_of_days" mode="month" event_limit="5" event_open_popup="true" form_view_id="%(ax_holidays.ax_leave_form_view)d" quick_add="False" show_unusual_days="True" delete="false">
 	            	<field name="employee_id" filters="1"/>
-	            	<field name="holiday_status_id" filters="1"/>
+	            	<!--<field name="holiday_status_id" filters="1"/>-->
 	            	<field name="number_of_days"/>
 	                <field name="from_date"/>
 	                <field name="to_date"/>
-	                <field name="name"/>
+	                <field name="description"/>
 	                <field name="state"/>
 	            </calendar>
 	        </field>
@@ -87,10 +87,10 @@
 			<field name="arch" type="xml">
 				<search string="Employee Leave">
 					<field name="employee_id" string="Employee"  filter_domain="[('employee_id','ilike',self)]" />
-					<field name="holiday_status_id" string="Time Off Type"  filter_domain="[('holiday_status_id','ilike',self)]" />
+					<!--<field name="holiday_status_id" string="Time Off Type"  filter_domain="[('holiday_status_id','ilike',self)]" />-->
 					<group expand="0" string="Group By...">
 						<filter name="employee" string="Employee" domain="[]" context="{'group_by':'employee_id'}"/> 
-						<filter name="holiday_status" string="Time Off Type" domain="[]" context="{'group_by':'holiday_status_id'}"/> 
+						<!--<filter name="holiday_status" string="Time Off Type" domain="[]" context="{'group_by':'holiday_status_id'}"/>--> 
 						<filter name="state" string="Status" domain="[]" context="{'group_by':'state'}"/> 
 					</group>
 				</search>

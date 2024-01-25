@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+    	<!-- Form view -->
+        <record id="ax_expiry_alert_form_view" model="ir.ui.view">
+            <field name="name">Expiry Alerts</field>
+            <field name="model">ax.expiry.alert</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+				<form string="Expiry Alerts">
+					<header>
+						<button name = "entry_approve" type = "object" string = "Approve" states = "draft" class = "oe_highlight"/>
+						<button name = "entry_draft" type = "object" string = "Set to Draft" states = "approved"/>
+						<button name = "entry_cancel" type = "object" string = "Cancel" states = "approved"/>
+						<field name="state" widget="statusbar" statusbar_visible='draft,approved,cancel'/>
+					</header>
+					<sheet> 
+						<div class="oe_title">
+	                        <h1>
+	                            <field name="name" required='1' attrs="{'readonly':[('state','!=','draft')]}" placeholder="Name"/>
+	                        </h1>
+	                    </div>
+						<group> 
+							<group>
+								<field name="doc_name" required='1' attrs="{'readonly':[('state','!=','draft')]}"/>
+								<field name="model_id" required='1' options="{'no_create':True,'no_open':True}" attrs="{'readonly':[('state','!=','draft')]}"/>
+								<field name="field_id" required='1' domain="[('model_id','=',model_id),('ttype','in',('date','datetime'))]" options="{'no_create':True,'no_open':True}" attrs="{'readonly':[('state','!=','draft')]}"/>
+								<label for="alert_on" string="Alert On"/>
+								<div class="o_row">
+									<field name="alert_condition" attrs="{'readonly':[('state','!=','draft')]}" required='1'/>
+									<field name="alert_on" attrs="{'readonly':[('state','!=','draft')],'invisible':[('alert_condition','=','same')],'required':[('alert_condition','!=','same')]}"/>
+									<field name="alert_period" attrs="{'readonly':[('state','!=','draft')],'invisible':[('alert_condition','=','same')],'required':[('alert_condition','!=','same')]}"/>
+								</div>
+								<field name="alert_subject" required='1' attrs="{'readonly':[('state','!=','draft')]}"/>
+								<field name="email_to_user_id" required='1' options="{'no_create':True,'no_open':True}" attrs="{'readonly':[('state','!=','draft')]}" domain="[('model_id','=',model_id),('relation','in',('res.users','hr.employee'))]"/>
+								<field name="default_email_to" attrs="{'readonly':[('state','!=','draft')]}"/>
+								<field name="default_email_cc" attrs="{'readonly':[('state','!=','draft')]}"/>
+								<field name="model_name" invisible='1'/>
+								<field name="alert_domain" widget="domain" options="{'model': 'model_name'}" attrs="{'readonly':[('state','!=','draft')]}"/>
+								<field name="company_id" force_save='1' attrs="{'readonly':[('state','!=','draft')]}" groups="base.group_multi_company" invisible='1'/>
+							</group>
+						</group>
+					</sheet>
+					<div class="oe_chatter">
+                       <field name="message_follower_ids" widget="mail_followers"/>
+                       <field name="activity_ids" widget="mail_activity"/>
+                       <field name="message_ids" widget="mail_thread"/>
+                   </div>
+				</form>
+            </field>
+        </record>
+        <!-- Tree View -->
+        <record id="ax_expiry_alerts_tree_view" model="ir.ui.view">
+            <field name="name">Expiry Alerts</field>
+            <field name="model">ax.expiry.alert</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+             <tree string="Expiry Alerts"  
+				decoration-info = "state == 'draft'" decoration-bf = "state == 'approved'"> 
+				<field name="name" />
+				<field name="model_id"/>
+				<field name="field_id"/>
+				<field name="state"/>  			 
+                </tree>
+            </field>
+        </record>
+        
+        <!-- Search View Start -->
+	
+	<record id="ax_expiry_alert_search_view" model="ir.ui.view">
+		<field name="name">Expiry Alerts</field>
+		<field name="model">ax.expiry.alert</field>
+		<field name="arch" type="xml">
+			<search string="Expiry Alerts">
+				<field name="name" string="Name"  filter_domain="[('name','ilike',self)]" />
+				<filter name="draft" string="Draft" domain="[('state','=','draft')]"/>
+				<filter name="approved" string="Approved" domain="[('state','=','approved')]"/>				
+				<filter name="cancel" string="Cancelled" domain="[('state','=','cancel')]"/>
+				<group expand="0" string="Group By...">
+					<filter string="State" name="state" domain="[]" context="{'group_by':'state'}"/>
+					<filter string="Form" name="model_id" domain="[]" context="{'group_by':'model_id'}"/>
+					<filter string="Field" name="field_id" domain="[]" context="{'group_by':'field_id'}"/>
+				</group>
+			</search>
+		</field>
+	</record>
+	
+	<!-- Search View End -->
+
+
+
+        <record id="action_ax_expiry_alerts" model="ir.actions.act_window">  
+            <field name="name">Expiry Alerts</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">ax.expiry.alert</field>
+            <field name="view_mode">form,tree</field>
+            <field name="view_id" ref="ax_expiry_alerts_tree_view"></field>
+            <field name="search_view_id" ref="ax_expiry_alert_search_view"/>
+            <field name="context">{'search_default_state':1}</field>
+        </record>
+
+        <!-- Menuitems -->
+    	<menuitem name="Expiry Alerts" id="pm_ax_expiry_alerts" action="action_ax_expiry_alerts" sequence='90' groups="ax_groups.admin_user_group" web_icon="ax_expiry_alert,static/img/expiry.png"/>
+
+        <!-- Record Rule -->
+    	<record id="rule_ax_expiry_alerts" model="ir.rule">
+            <field name="name">Expiry Alerts multi-company</field>
+            <field name="model_id" ref="model_ax_expiry_alert"/>
+            <field eval="True" name="global"/>
+            <field name="domain_force">['|',('company_id','=',False),('company_id','in',company_ids)]</field>
+        </record>
+
+        <!-- Expiry Alert Scheduler -->
+        <record id="ax_expiry_alert_scheduler" model="ir.cron">
+            <field name="name">Expiry Alert Scheduler</field>
+            <field name="model_id" ref="model_ax_expiry_alert"/>
+            <field name="state">code</field>
+            <field name="code">model._entry_send_expiry_alerts()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="active">True</field>
+            <field name="doall" eval="False"/>
+        </record>
+
+        <!-- Expiry Alerts Mail -->
+        <record id="email_template_ax_expiry_alerts" model="mail.template">
+            <field name="name">Expiry Alert Emails</field>
+            <field name="model_id" ref="model_ax_expiry_alert"/>
+            <field name="email_from">${ctx['email_from'] |safe}</field>
+            <field name="email_to">${ctx['email_to'] |safe}</field>
+            <field name="email_cc">${ctx['email_cc'] |safe}</field>
+            <field name="subject">${object.alert_subject}</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px;">
+                    <p style="margin: 0px; padding: 0px; font-size: 13px;">
+                    	Dear ${ctx['name']},
+                        <br></br>
+                        <br></br>
+                        Your <b>${object.doc_name}</b> is going to expire on <b>${ctx['expiry_date'].strftime("%d/%b/%Y")}</b>.
+                        <br/>
+                        Please renew as soon as possible.
+                        <br></br>
+                        <br></br>
+                        For Reference:<br/>
+                        Model/Form : ${object.model_id.name}<br/>
+                        Date Field : ${object.field_id.field_description}<br/>
+                        Document No: ${ctx['doc_no']}
+                        <br></br>
+                        <br></br>
+                        Please feel free to contact us if you have any questions.
+                    </p>
+                </div>
+            </field>
+            <field name="lang">${object.user_id.lang}</field>
+            <field name="auto_delete" eval="True"/>
+        </record>
+            
+    </data>
+</openerp>

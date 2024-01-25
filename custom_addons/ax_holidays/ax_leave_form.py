@@ -1,5 +1,5 @@
 from odoo import api,fields,models
-from datetime import datetime,time
+from datetime import datetime,time,timedelta
 from pytz import UTC
 from dateutil.rrule import rrule, DAILY
 
@@ -11,10 +11,11 @@ class AxLeave(models.Model):
 
 	from_date = fields.Date("From Date",default=fields.Date.today,tracking=True)
 	to_date = fields.Date("To Date",default=fields.Date.today,tracking=True)
-	employee_id = fields.Many2one("hr.employee",'Employee',tracking=True)
+	employee_id = fields.Many2one("hr.employee",'Employee',tracking=True,required=True)
 	holiday_status_id = fields.Many2one("hr.leave.type",'Time Off Type',tracking=True)
 	number_of_days = fields.Float("Duration",compute='_get_number_of_days',store=True,tracking=True)
-	name = fields.Char("Description",tracking=True)
+	name = fields.Char("Description",related='employee_id.name',store=True,tracking=True)
+	description = fields.Char("Reason",tracking=True,required=True)
 	user_id = fields.Many2one("res.users",'Created By',default=lambda self:self.env.user.id)
 	company_id = fields.Many2one("res.company",'Company',default=lambda self:self.env.company.id)
 	entry_date = fields.Date("Entry Date",default=fields.Date.today)
@@ -45,3 +46,11 @@ class AxLeave(models.Model):
 
 		works = {d[0].date() for d in calendar._work_intervals_batch(dfrom, dto)[False]}
 		return {fields.Date.to_string(day.date()): (day.date() not in works) for day in rrule(DAILY, dfrom, until=dto)}
+	
+	
+class CalendarLeaves(models.Model):
+	_inherit = "resource.calendar.leaves"
+	
+	date_from = fields.Datetime('Start Date', required=True, default=datetime.now().replace(hour=0, minute=0, second=0) - timedelta(hours=5.5))
+	date_to = fields.Datetime('End Date', required=True, default=datetime.now().replace(hour=23, minute=59, second=59) - timedelta(hours=5.5))
+	

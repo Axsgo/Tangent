@@ -138,5 +138,6 @@ class HrTimesheetStatus(models.Model):
     
     name = fields.Char('Name', required=True)
     sequence = fields.Integer('Sequence')
+    for_admin = fields.Boolean('For Admin')
     
         
