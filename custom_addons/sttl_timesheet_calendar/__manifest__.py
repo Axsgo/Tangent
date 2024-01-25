@@ -17,6 +17,7 @@
     'data': [
         'data/timesheet_submission_scheduler.xml',
         'security/ir.model.access.csv',
+        'security/security.xml',
         'views/hr_timesheet_view.xml',
         'views/hr_timesheet_submit_view.xml',
         'views/project_project_view.xml'

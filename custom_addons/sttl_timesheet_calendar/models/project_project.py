@@ -11,5 +11,5 @@ class ProjectProject(models.Model):
             return [('for_admin', '!=', True)]
         return []
     
-    stage_id = fields.Many2one("hr.timesheet.status",'Stages',order='sequence asc', domain=_domain_stages)
+    stage_id = fields.Many2one("hr.timesheet.status",'Stages',order='sequence asc', domain=_domain_stages, readonly=True)
         

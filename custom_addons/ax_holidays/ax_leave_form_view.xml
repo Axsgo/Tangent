@@ -68,7 +68,7 @@
 	        <field name="model">ax.leave</field>
 	        <field name="arch" type="xml">
 	            <calendar date_start="from_date" date_stop="to_date" color="employee_id" string="Description" date_delay="number_of_days" mode="month" event_limit="5" event_open_popup="true" form_view_id="%(ax_holidays.ax_leave_form_view)d" quick_add="False" show_unusual_days="True" delete="false">
-	            	<field name="employee_id" filters="1"/>
+	            	<field name="employee_id"/>
 	            	<!--<field name="holiday_status_id" filters="1"/>-->
 	            	<field name="number_of_days"/>
 	                <field name="from_date"/>
@@ -118,5 +118,28 @@
 	        <field eval="True" name="global"/>
 	        <field name="domain_force">['|',('company_id','=',False),('company_id','in',company_ids)]</field>
 	    </record> 
+	    
+	    <record id="hr_holidays.hr_leave_view_dashboard" model="ir.ui.view">
+	        <field name="name">hr.leave.view.dashboard</field>
+	        <field name="model">hr.leave</field>
+	        <field name="arch" type="xml">
+	            <calendar string="Time Off Request" form_view_id="%(hr_holidays.hr_leave_view_form_dashboard)d" event_open_popup="true" date_start="date_from" date_stop="date_to" mode="month" quick_add="False" show_unusual_days="True" color="holiday_status_id" hide_time="True">
+	                <field name="display_name"/>
+	                <field name="holiday_status_id" invisible="1"/>
+	                <field name="state" invisible="1"/>
+	            </calendar>
+	        </field>
+	    </record>
+	    
+	    <record id="hr_leave_report_calendar_view_inherit" model="ir.ui.view">
+	        <field name="name">hr.leave.report.calendar.inherit</field>
+	        <field name="model">hr.leave.report.calendar</field>
+	        <field name="inherit_id" ref="hr_holidays.hr_leave_report_calendar_view"/>
+	        <field name="arch" type="xml">
+	            <xpath expr="//field[@name='employee_id']" position="replace">
+	                <field name="employee_id" invisible="1"/>
+	            </xpath>
+	        </field>
+	    </record>
 	</data>
 </openerp>

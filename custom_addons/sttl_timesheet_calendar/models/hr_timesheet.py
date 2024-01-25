@@ -41,6 +41,25 @@ class AccountAnalyticLine(models.Model):
     @api.onchange('project_id','unit_amount')
     def _onchange_project_unit_amount(self):
         self.name = str(self.project_id.project_no)+' - '+str(self.project_id.name)
+        
+    @api.onchange('project_id')
+    def onchange_project_id(self):
+        self.status_id = False
+        res = {'domain': {'status_id': "[('id', 'not in', False)]"}}
+        status_ids = []
+        if self.user_has_groups('ax_groups.admin_user_group'):
+            if self.project_id.stage_id:
+                status_ids.append(self.env['hr.timesheet.status'].search([('sequence','=',(self.project_id.stage_id.sequence+1))],limit=1).id)
+            else:
+                status_ids.append(self.env['hr.timesheet.status'].search([('for_admin', '=', True)],order='sequence',limit=1).id)
+            res['domain']['status_id'] = "[('id', 'in', %s)]" % status_ids
+        else:
+            if self.project_id.stage_id:
+                status_ids.append(self.env['hr.timesheet.status'].search([('sequence','=',(self.project_id.stage_id.sequence+1))],limit=1).id)
+            else:
+                status_ids.append(self.env['hr.timesheet.status'].search([('for_admin', '!=', True)],order='sequence',limit=1).id)
+            res['domain']['status_id'] = "[('id', 'in', %s)]" % status_ids
+        return res
     
     # @api.onchange('hours','minutes')
     # def _onchange_time(self):
