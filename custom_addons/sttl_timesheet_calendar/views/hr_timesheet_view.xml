@@ -11,6 +11,8 @@
 	            <field name="date"/>
 	            <field name="project_id"/>
 	            <field name="status_id"/>
+                <field name="from_date"/>
+                <field name="to_date"/>
 	            <field name="unit_amount" string="Duration (HH:MM)" widget="float_time"/>
                 <field name="description"/>
             </calendar>
@@ -32,16 +34,27 @@
                     <group>
                         <group>
                             <field name="project_id" options="{'no_create': True}" required="1" context="{'form_view_ref': 'project.project_project_view_form_simplified',}"/>
-                            <field name="status_id" options="{'no_create': True}"/>
+                            <field name="from_date"/>
+                            <field name="unit_amount" string="Duration (HH:MM)" widget="float_time" decoration-danger="unit_amount &gt; 24" readonly='1' force_save='1' style="
+                                background-color:#dcedfc !important;
+                                width:50px;
+                                height:25px;
+                                line-height:25px;
+                                text-align:center;
+                                color:#306391 !important;
+                                display:inline-block;
+                                padding-right: 0.6em;
+                                padding-left: 0.6em;
+                                border-radius: 4px;
+                            "/>
                             <field name="name" invisible="1"/>
                             <field name="company_id" groups="base.group_multi_company"/>
                         </group>
                         <group>
                             <field name="amount" invisible="1"/>
-                            <!--<field name="hours"/>
-                            <field name="minutes"/>-->
+                            <field name="status_id" options="{'no_create': True}"/>
+                            <field name="to_date"/>
                             <field name="task_id" invisible="1" options="{'no_create': True}" widget="task_with_hours" context="{'default_project_id': project_id}" domain="[('project_id', '=', project_id)]"/>
-                            <field name="unit_amount" string="Duration (HH:MM)" widget="float_time" decoration-danger="unit_amount &gt; 24"/>
                             <field name="currency_id" invisible="1"/>
                         </group>
                     </group>
@@ -141,5 +154,63 @@
     
     <menuitem id="hr_holidays_resource" action="resource.action_resource_calendar_form"
         name="Working Times" parent="hr_holidays.menu_hr_holidays_configuration" groups="ax_groups.admin_user_group"/>
+
+    <!-- 1st timesheet alert Scheduler -->
+    <record id="ax_project_start_alert_scheduler" model="ir.cron">
+        <field name="name">Project Start Alert Scheduler</field>
+        <field name="model_id" ref="model_account_analytic_line"/>
+        <field name="state">code</field>
+        <field name="code">model._entry_send_project_start_alert()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="active">True</field>
+        <field name="doall" eval="False"/>
+    </record>
+
+    <!-- 1st timsheet Alerts Mail -->
+    <record id="email_template_project_start_alerts" model="mail.template">
+        <field name="name">Project Start Notification</field>
+        <field name="model_id" ref="model_account_analytic_line"/>
+        <field name="email_from">${ctx['email_from'] |safe}</field>
+        <field name="email_to">${ctx['email_to'] |safe}</field>
+        <field name="email_cc">${ctx['email_cc'] |safe}</field>
+        <field name="subject">First Timesheet Created for the Project - ${object.project_id.project_no}</field>
+        <field name="body_html" type="html">
+            <div style="margin: 0px; padding: 0px;">
+                <p style="margin: 0px; padding: 0px; font-size: 13px;">
+                    Dear Team,
+                    <br></br>
+                    <br></br>
+                    First Timesheet was created for the Project - <b>${object.project_id.project_no} - ${object.project_id.name}</b>
+                    <br/><br/>
+                    <u><i>Find the below timehseet details for your reference</i></u>
+                    <br></br>
+                    Project : ${object.project_id.project_no} - ${object.project_id.name}<br/>
+                    Employee : ${object.employee_id.name}<br/>
+                    Start Time : ${object.from_date.strftime("%d/%m/%Y %H:%M:%S")}<br/>
+                    End Time : ${object.to_date.strftime("%d/%m/%Y %H:%M:%S")}<br/>
+                    Duration(HH:MM) : <span style="
+                                background-color:#dcedfc !important;
+                                width:50px;
+                                height:25px;
+                                line-height:25px;
+                                text-align:center;
+                                color:#306391 !important;
+                                display:inline-block;
+                                padding-right: 0.6em;
+                                padding-left: 0.6em;
+                                border-radius: 4px;
+                            ">${ctx['float_time']}</span><br/>
+                    Stage : ${object.status_id.name}
+                    <br></br>
+                    <br></br>
+                    Please feel free to contact us if you have any questions.
+                </p>
+            </div>
+        </field>
+        <field name="lang">${object.user_id.lang}</field>
+        <field name="auto_delete" eval="True"/>
+    </record>
 
 </odoo>

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import api, fields, models, _
-from datetime import datetime, time
+from datetime import datetime, time, timedelta
 import pytz
 from dateutil.rrule import rrule, DAILY
 from odoo.exceptions import UserError
@@ -31,12 +31,13 @@ class AccountAnalyticLine(models.Model):
 
     # hours = fields.Integer("Duration (Hours)")
     # minutes = fields.Integer("Duration (Minutes)")
-    # from_date = fields.Datetime("From Date", default=datetime.now())
-    # to_date = fields.Datetime("To Date",readonly=True)
+    from_date = fields.Datetime("Start Time", default=datetime.now())
+    to_date = fields.Datetime("End Time",default=datetime.now())
     status_id = fields.Many2one("hr.timesheet.status",'Stages',order='sequence asc', domain=_domain_stages)
     # status_id = fields.Many2one("project.task.type",'Stages',order='sequence asc')
     description = fields.Text('Description')
     message = fields.Text('Message')
+    is_project_start_mail_sent = fields.Boolean("Project Start Mail Sent?",default=False,copy=False)
     
     @api.onchange('project_id','unit_amount')
     def _onchange_project_unit_amount(self):
@@ -61,10 +62,19 @@ class AccountAnalyticLine(models.Model):
             res['domain']['status_id'] = "[('id', 'in', %s)]" % status_ids
         return res
     
-    # @api.onchange('hours','minutes')
-    # def _onchange_time(self):
-    #     hours, minutes = divmod(self.minutes, 60)
-    #     self.unit_amount = self.hours+hours+(minutes/100)
+    @api.onchange('from_date','to_date')
+    def _onchange_time(self):
+        if self.from_date and self.to_date:
+            if self.from_date > self.to_date:
+                raise UserError("End Time should be greater than Start Time.")
+            time_diff = (self.to_date - self.from_date)
+            if time_diff.seconds>=60:
+                time_difference_seconds = (self.to_date - self.from_date).total_seconds()
+                self.unit_amount = time_difference_seconds / 3600.0
+            else:
+                self.unit_amount = 0.0
+        else:
+            self.unit_amount = 0.0
     
     # @api.onchange('unit_amount')
     # def _onchange_unit_amount(self):
@@ -89,6 +99,8 @@ class AccountAnalyticLine(models.Model):
                 raise UserError(_("You can not create/update timesheet for this date"))
             if res.unit_amount <= 0:
                 raise UserError(_("You can not update zero duration timesheet"))
+            if res.to_date < res.from_date:
+                raise UserError(_("End Time should be greater than Start Time."))
             res.project_id.stage_id = res.status_id.id
         return lines
 
@@ -100,6 +112,8 @@ class AccountAnalyticLine(models.Model):
         rec.project_id.stage_id = rec.status_id.id
         if rec.unit_amount <= 0:
             raise UserError(_("You can not update zero duration timesheet"))
+        if rec.to_date < rec.from_date:
+            raise UserError(_("End Time should be greater than Start Time."))
         return res
     
     @api.model
@@ -116,3 +130,21 @@ class AccountAnalyticLine(models.Model):
         works = {d[0].date() for d in calendar._work_intervals_batch(dfrom, dto)[False]}
         return {fields.Date.to_string(day.date()): (day.date() not in works) for day in rrule(DAILY, dfrom, until=dto)}
     
+    def float_to_time(self,float_value):
+        hours = int(float_value)
+        minutes = int((float_value - hours) * 60)
+        return f"{hours:02d}:{minutes:02d}"
+
+    def _entry_send_project_start_alert(self):
+        timesheet_ids = self.env['account.analytic.line'].search([('project_id','!=',False),('project_id.timesheet_count','=',1),
+            ('is_project_start_mail_sent','=',False)])
+        if timesheet_ids:
+            for timesheet_id in timesheet_ids:
+                context = {
+                    'email_to':timesheet_id.employee_id.parent_id.user_id.email,
+                    'email_cc':timesheet_id.project_id.user_id.email,
+                    'email_from':self.env.company.erp_email,
+                    'float_time':self.float_to_time(timesheet_id.unit_amount),
+                }
+                template = self.env['ir.model.data'].get_object('sttl_timesheet_calendar', 'email_template_project_start_alerts')
+                self.env['mail.template'].browse(template.id).with_context(context).send_mail(timesheet_id.id,force_send=True)
