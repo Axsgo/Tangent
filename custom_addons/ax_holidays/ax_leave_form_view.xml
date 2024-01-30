@@ -153,5 +153,31 @@
 	            </xpath>
 	        </field>
 	    </record>
+	    
+	    <record id="hr_leave_view_form_inherit" model="ir.ui.view">
+	        <field name="name">hr.leave.inherit</field>
+	        <field name="model">hr.leave</field>
+	        <field name="inherit_id" ref="hr_holidays.hr_leave_view_form"/>
+	        <field name="arch" type="xml">
+	            <xpath expr="//field[@name='tz_mismatch']" position="before">
+	            	<div class="row" attrs="{'invisible': [('message','=', False)]}">
+						<h4 class="alert alert-danger" role="alert"><field name="message" nolabel="1" readonly="1"/></h4>
+					</div>
+	                <field name="message" invisible="1"/>
+	            </xpath>
+	        </field>
+	    </record>
+	    
+	    <record id="edit_holiday_status_form_inherit" model="ir.ui.view">
+	        <field name="name">hr.leave.type.inherit</field>
+	        <field name="model">hr.leave.type</field>
+	        <field name="inherit_id" ref="hr_holidays.edit_holiday_status_form"/>
+	        <field name="arch" type="xml">
+	            <xpath expr="//field[@name='allocation_notif_subtype_id']" position="after">
+	                <field name="leave_limit"/>
+	                <field name="future_days"/>
+	            </xpath>
+	        </field>
+	    </record>
 	</data>
 </openerp>

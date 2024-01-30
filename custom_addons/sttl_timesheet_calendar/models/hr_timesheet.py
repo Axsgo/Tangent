@@ -20,6 +20,11 @@ class AccountAnalyticLine(models.Model):
             employee_id = self.env['hr.employee'].search([('user_id', '=', self.env.user.id)], limit=1).id
             if self.env['hr.timesheet.submit.line'].search([('employee_id','=',employee_id),('submit_id.from_date','<=',result.get('date')),('submit_id.to_date','>=',result.get('date')),('state','=','lock')]):
                 result['message'] = "You can not create/update timesheet for this date"
+        date = result.get('date', False)
+        if date:
+            date = datetime.combine(date, datetime.min.time())
+            result['from_date'] = date.replace(hour=0, minute=0, second=0) - timedelta(hours=5.5)
+            result['to_date'] = date.replace(hour=0, minute=0, second=0) - timedelta(hours=5.5)
         return result
     
     def _domain_stages(self):
@@ -31,8 +36,8 @@ class AccountAnalyticLine(models.Model):
 
     # hours = fields.Integer("Duration (Hours)")
     # minutes = fields.Integer("Duration (Minutes)")
-    from_date = fields.Datetime("Start Time", default=datetime.now())
-    to_date = fields.Datetime("End Time",default=datetime.now())
+    from_date = fields.Datetime("Start Time")
+    to_date = fields.Datetime("End Time",compute='_onchange_unit_amount')
     status_id = fields.Many2one("hr.timesheet.status",'Stages',order='sequence asc', domain=_domain_stages)
     # status_id = fields.Many2one("project.task.type",'Stages',order='sequence asc')
     description = fields.Text('Description')
@@ -62,24 +67,23 @@ class AccountAnalyticLine(models.Model):
             res['domain']['status_id'] = "[('id', 'in', %s)]" % status_ids
         return res
     
-    @api.onchange('from_date','to_date')
-    def _onchange_time(self):
-        if self.from_date and self.to_date:
-            if self.from_date > self.to_date:
-                raise UserError("End Time should be greater than Start Time.")
-            time_diff = (self.to_date - self.from_date)
-            if time_diff.seconds>=60:
-                time_difference_seconds = (self.to_date - self.from_date).total_seconds()
-                self.unit_amount = time_difference_seconds / 3600.0
-            else:
-                self.unit_amount = 0.0
-        else:
-            self.unit_amount = 0.0
+    # @api.onchange('from_date','to_date')
+    # def _onchange_time(self):
+    #     if self.from_date and self.to_date:
+    #         if self.from_date > self.to_date:
+    #             raise UserError("End Time should be greater than Start Time.")
+    #         time_difference_seconds = (self.to_date - self.from_date).total_seconds()
+    #         self.unit_amount = time_difference_seconds / 3600.0
+    #     else:
+    #         self.unit_amount = 0.0
     
-    # @api.onchange('unit_amount')
-    # def _onchange_unit_amount(self):
-    #     if self.from_date:
-    #         self.to_date = self.from_date+timedelta(hours=self.unit_amount)
+    @api.depends('unit_amount','from_date')
+    def _onchange_unit_amount(self):
+        for rec in self:
+            if rec.from_date:
+                rec.to_date = rec.from_date+timedelta(hours=rec.unit_amount)
+            else:
+                rec.to_date = False
 
     # @api.onchange('name')
     # def _onchange_date(self):
@@ -105,16 +109,19 @@ class AccountAnalyticLine(models.Model):
         return lines
 
     def write(self, vals):
-        for rec in self:
-            if self.env['hr.timesheet.submit.line'].search([('employee_id','=',rec.employee_id.id),('submit_id.from_date','<=',rec.date),('submit_id.to_date','>=',rec.date),('state','=','lock')]):
-                raise UserError(_("You can not create/update timesheet for this date"))
-        res = super(AccountAnalyticLine, self).write(vals)
-        rec.project_id.stage_id = rec.status_id.id
-        if rec.unit_amount <= 0:
+        rec = super(AccountAnalyticLine, self).write(vals)
+        if 'holiday_id' in vals:
+            return rec
+        if self.env['hr.timesheet.submit.line'].search([('employee_id','=',self.employee_id.id),('submit_id.from_date','<=',self.date),('submit_id.to_date','>=',self.date),('state','=','lock')]):
+            raise UserError(_("You can not create/update timesheet for this date"))
+        if self.unit_amount <= 0:
             raise UserError(_("You can not update zero duration timesheet"))
-        if rec.to_date < rec.from_date:
+        if self.to_date < self.from_date:
             raise UserError(_("End Time should be greater than Start Time."))
-        return res
+        if self.date != self.from_date.date() or self.date != self.to_date.date():
+            raise UserError("Start Time and End Time date should be same as Timesheet Date.")
+        self.project_id.stage_id = self.status_id.id
+        return rec
     
     @api.model
     def get_unusual_days(self, date_from, date_to=None):

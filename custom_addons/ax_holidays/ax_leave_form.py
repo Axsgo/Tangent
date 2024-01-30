@@ -1,7 +1,10 @@
-from odoo import api,fields,models
-from datetime import datetime,time,timedelta
+from odoo import api,fields,models,_
+from datetime import date,datetime,time,timedelta
 from pytz import UTC
 from dateutil.rrule import rrule, DAILY
+from odoo.exceptions import UserError
+from dateutil import parser
+
 
 class AxLeave(models.Model):
 	_name = "ax.leave"
@@ -53,4 +56,41 @@ class CalendarLeaves(models.Model):
 	
 	date_from = fields.Datetime('Start Date', required=True, default=datetime.now().replace(hour=0, minute=0, second=0) - timedelta(hours=5.5))
 	date_to = fields.Datetime('End Date', required=True, default=datetime.now().replace(hour=23, minute=59, second=59) - timedelta(hours=5.5))
+
+
+class HrLeave(models.Model):
+	_inherit = "hr.leave"
+	
+	message = fields.Text('Message')
+	
+	@api.onchange('holiday_status_id')
+	def _onchange_holiday_status_id(self):
+		leave_ids = self.env['hr.leave'].search([('employee_id','=',self.employee_id.id),('holiday_status_id.code','=','SL'),('state','not in',('cancel','refuse'))])
+		leave_count = 0
+		if self.holiday_status_id.code == 'SL':
+			for leave in leave_ids:
+				leave_days = leave.get_unusual_days(leave.request_date_from,leave.request_date_to)
+				leave_count += list(leave_days.values()).count(False)
+			if leave_count > self.holiday_status_id.leave_limit:
+				self.message = (("Alreday you applied %s days sick leaves")%leave_count)
+			else:
+				self.message = False
+		else:
+			self.message = False
+	
+	@api.model
+	def create(self, vals):
+		type_id = self.env['hr.leave.type'].search([('id','=',vals.get('holiday_status_id'))])
+		if type_id.future_days == True:
+			if parser.parse(vals.get('request_date_from')).date()>date.today() or parser.parse(vals.get('request_date_to')).date()>date.today():
+				raise UserError(_("You can't apply leave for future date"))
+		return super(HrLeave, self).create(vals)
+	
+	
+class HrLeaveType(models.Model):
+	_inherit = "hr.leave.type"
+	
+	leave_limit = fields.Integer('Leave warning Limit')
+	future_days = fields.Boolean('Restrict future dates')
+	
 	

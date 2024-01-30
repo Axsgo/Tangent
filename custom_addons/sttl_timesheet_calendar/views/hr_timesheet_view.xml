@@ -35,25 +35,14 @@
                         <group>
                             <field name="project_id" options="{'no_create': True}" required="1" context="{'form_view_ref': 'project.project_project_view_form_simplified',}"/>
                             <field name="from_date"/>
-                            <field name="unit_amount" string="Duration (HH:MM)" widget="float_time" decoration-danger="unit_amount &gt; 24" readonly='1' force_save='1' style="
-                                background-color:#dcedfc !important;
-                                width:50px;
-                                height:25px;
-                                line-height:25px;
-                                text-align:center;
-                                color:#306391 !important;
-                                display:inline-block;
-                                padding-right: 0.6em;
-                                padding-left: 0.6em;
-                                border-radius: 4px;
-                            "/>
+                            <field name="unit_amount" string="Duration (HH:MM)" widget="float_time" decoration-danger="unit_amount &gt; 24"/>
                             <field name="name" invisible="1"/>
                             <field name="company_id" groups="base.group_multi_company"/>
                         </group>
                         <group>
                             <field name="amount" invisible="1"/>
                             <field name="status_id" options="{'no_create': True}"/>
-                            <field name="to_date"/>
+                            <field name="to_date" readonly='1' force_save='1'/>
                             <field name="task_id" invisible="1" options="{'no_create': True}" widget="task_with_hours" context="{'default_project_id': project_id}" domain="[('project_id', '=', project_id)]"/>
                             <field name="currency_id" invisible="1"/>
                         </group>
