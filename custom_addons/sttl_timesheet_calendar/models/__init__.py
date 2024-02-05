@@ -4,3 +4,5 @@
 from . import hr_timesheet
 from . import hr_timesheet_submit
 from . import project_project
+from . import hr_timesheet_submit_report
+from . import hr_employee

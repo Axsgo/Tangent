@@ -7,10 +7,26 @@
             <field name="inherit_id" ref="project.edit_project" />
             <field name="arch" type="xml">
 				<xpath expr="//header/button" position="after">
-					<field name="stage_id" widget="statusbar" options="{'clickable': '0'}"/>
+					<field name="stage_id" widget="statusbar" options="{'clickable': '1'}"/>
+				</xpath>
+				<xpath expr="//field[@name='company_id']" position="after">
+					<field name="allowed_stage_ids" widget="many2many_tags" options="{'no_create': True}"/>
 				</xpath>
             </field>
         </record>
+        
+        <!--  Tree view  -->
+		<record model="ir.ui.view" id="sttl_view_project_view_tree_inherit">
+			<field name="name">project.project.tree</field>
+			<field name="model">project.project</field>
+			<field name="inherit_id" ref="project.view_project" />
+			<field name="arch" type="xml">
+				<field name="partner_id" position="after">
+					<field name="timesheet_count" width="0.5" />
+					<field name="timesheet_duration" width="0.5" widget="float_time" />
+				</field>
+			</field>
+		</record>
 	</data>
 </odoo>
 	

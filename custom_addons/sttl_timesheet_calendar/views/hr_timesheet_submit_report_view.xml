@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+    	<!--Timesheet submit report-->	
+    	<record id="hr_timesheet_submit_report_form_view" model="ir.ui.view">
+            <field name="name">Timesheet Submit Report</field>
+            <field name="model">hr.timesheet.submit.report</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+				<form string="Timesheet Submit Report">
+					<group>
+						<!--<field name="submit_ids" options="{'no_create': True}" widget="many2many_tags" required="1"/>-->
+						<group>
+							<field name="from_date" required="1"/>
+							<field name="submit_status" required="1"/>
+						</group>
+						<group>
+							<field name="to_date" required="1"/>
+						</group>
+					</group>
+					<group>
+						<field name="line_ids" nolabel="1" readonly="1" >
+							<tree limit="2000">
+								<field name="submit_id" string="Week"/>
+								<field name="employee_id"/>
+								<field name="total_hrs" string="Hours" widget="float_time"/>
+							</tree>
+						</field>
+					</group>
+					<footer>
+					</footer>
+				</form>
+            </field>
+        </record>
+
+    	<record id="action_hr_timesheet_submit_report" model="ir.actions.act_window">  
+            <field name="name">Timesheet Submit Report</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hr.timesheet.submit.report</field>
+            <field name="view_mode">form</field>
+        </record>
+
+    	<menuitem name="Timesheet Submit Report" id="hr_timesheet_submit_report" parent="hr_timesheet.menu_timesheets_reports" 
+    		action="action_hr_timesheet_submit_report" sequence='12'/>
+    		
+    </data>
+</odoo>

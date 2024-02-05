@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 	<data>
+        <!-- Form view -->
         <record model="ir.ui.view" id="project_est_view_form">
             <field name="name">project.project.form</field>
             <field name="model">project.project</field>
@@ -29,6 +30,48 @@
                             </group>
                     	</group>
                     </page>
+                </xpath>
+                <div name="options_active" position="before">
+                    <div name="parent_project">
+                        <div>
+                            <label for="parent_id" class="oe_inline" string="Parent Project:"/>
+                            <field name="parent_id" class="oe_inline oe_input_align" options="{'no_create':True,'no_open':True}"/>
+                            <field name='is_sub_project' invisible='1'/>
+                        </div>
+                    </div>
+                </div>
+            </field>
+        </record>
+
+        <!-- Tree view -->
+        <record model="ir.ui.view" id="view_project_view_tree_inherit">
+            <field name="name">project.project.tree</field>
+            <field name="model">project.project</field>
+            <field name="inherit_id" ref="project.view_project" />
+            <field name="arch" type="xml">
+                <field name="name" position="before">
+                    <field name="project_no" width="0.5" decoration-bf='1'/>
+                </field>
+                <field name="name" position="after">
+                    <field name="parent_id"/>
+                </field>
+            </field>
+        </record>
+
+        <!-- search view -->
+        <record model="ir.ui.view" id="view_project_view_search_inherit">
+            <field name="name">project.project.search</field>
+            <field name="model">project.project</field>
+            <field name="inherit_id" ref="project.view_project_project_filter" />
+            <field name="arch" type="xml">
+                <field name="name" position="before">
+                    <field name="project_no" string="Project Number"/>
+                </field>
+                <field name="name" position="after">
+                    <field name="parent_id" string="Parent Project"/>
+                </field>
+                <xpath expr="//group/filter[@name='Manager']" position="before">
+                    <filter string="Parent Project" name="Parent" context="{'group_by': 'parent_id'}"/>
                 </xpath>
             </field>
         </record>

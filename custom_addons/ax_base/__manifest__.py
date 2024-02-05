@@ -9,7 +9,7 @@
     'data': [
     'company_view.xml',
     ],
-    'depends': ['base'],
+    'depends': ['base','hr_timesheet'],
     'installable': True,
     'auto_install': False,
     'application': True,

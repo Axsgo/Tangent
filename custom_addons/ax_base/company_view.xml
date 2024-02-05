@@ -20,6 +20,25 @@
                 <field name="vat" position="attributes">
                     <attribute name="string">VAT</attribute>
                 </field>
+                <page name="general_info" position="after">
+                    <page string="Timesheet Configurations" name="timesheet_settings">
+                        <group>
+                            <group>
+                                <field name="timesheet_working_hrs" widget="float_time"/>
+                                <label for="timesheet_manager_alert"/>
+                                <div class="o_row">
+                                    <field name="timesheet_manager_alert"/><span> - </span>
+                                    <field name="timesheet_manager_nxt_date"/>
+                                </div>
+                                <label for="timesheet_admin_alert"/>
+                                <div class="o_row">
+                                    <field name="timesheet_admin_alert"/><span> - </span>
+                                    <field name="timesheet_admin_nxt_date"/>
+                                </div>
+                            </group>
+                        </group>
+                    </page>
+                </page>
             </field>
         </record>
     </data>
