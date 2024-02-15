@@ -141,6 +141,14 @@ class HrTimesheetSubmitWizard(models.TransientModel):
             else:
                 rec.total_hrs = 0
                 
+    @api.onchange('employee_id')
+    def onchange_employee_id(self):
+        res = {'domain': {'submit_id': "[('id', 'not in', False)]"}}
+        submit_ids = self.env['hr.timesheet.submit.line'].search([('employee_id','=',self.employee_id.id),('submit_status','!=','submit')]).mapped('submit_id') or False
+        if self.employee_id and submit_ids:
+            res['domain']['submit_id'] = "[('id', 'in', %s)]" % submit_ids.ids
+        return res
+                
     def lock(self):
         submit_id = self.env['hr.timesheet.submit.line'].search([('employee_id','=',self.employee_id.id),('submit_id','=',self.submit_id.id),('submit_status','=','not_submit')])
         if not submit_id:

@@ -245,5 +245,102 @@
         <field name="lang">${object.user_id.lang}</field>
         <field name="auto_delete" eval="True"/>
     </record>
-
+    
+    <record id="hr_timesheet_line_search_employee" model="ir.ui.view">
+        <field name="name">account.analytic.line.search</field>
+        <field name="model">account.analytic.line</field>
+        <field name="arch" type="xml">
+            <search string="Timesheet">
+                <field name="employee_id"/>
+                <field name="department_id"/>
+                <separator/>
+                <filter name="month" string="Date" date="date"/>
+                <group expand="0" string="Group By">
+                    <filter string="Date" name="groupby_date" domain="[]" context="{'group_by': 'date'}" help="Timesheet by Date"/>
+                    <filter string="Department" name="groupby_department" domain="[]" context="{'group_by': 'department_id'}"/>
+                    <filter string="Employee" name="groupby_employee" domain="[]" context="{'group_by': 'employee_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    
+    <record id="hr_timesheet_line_search_project" model="ir.ui.view">
+        <field name="name">account.analytic.line.search</field>
+        <field name="model">account.analytic.line</field>
+        <field name="arch" type="xml">
+            <search string="Timesheet">
+                <field name="date"/>
+                <field name="project_id"/>
+                <separator/>
+                <filter name="month" string="Date" date="date"/>
+                <group expand="0" string="Group By">
+                    <filter string="Project" name="groupby_project" domain="[]" context="{'group_by': 'project_id'}"/>
+                    <filter string="Date" name="groupby_date" domain="[]" context="{'group_by': 'date'}" help="Timesheet by Date"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    
+    <record id="hr_timesheet_line_search_task" model="ir.ui.view">
+        <field name="name">account.analytic.line.search</field>
+        <field name="model">account.analytic.line</field>
+        <field name="arch" type="xml">
+            <search string="Timesheet">
+                <field name="date"/>
+                <field name="task_id"/>
+                <separator/>
+                <filter name="month" string="Date" date="date"/>
+                <group expand="0" string="Group By">
+                    <filter string="Task" name="groupby_task" domain="[]" context="{'group_by': 'task_id'}"/>
+                    <filter string="Date" name="groupby_date" domain="[]" context="{'group_by': 'date'}" help="Timesheet by Date"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    
+    <record id="hr_timesheet.act_hr_timesheet_report" model="ir.actions.act_window">
+        <field name="name">Timesheets By Employee</field>
+        <field name="res_model">account.analytic.line</field>
+        <field name="domain">[('project_id', '!=', False)]</field>
+        <field name="context">{'search_default_groupby_employee':1,}</field>
+        <field name="search_view_id" ref="hr_timesheet_line_search_employee"/>
+        <field name="help" type="html">
+          <p class="o_view_nocontent_smiling_face">
+            No activities found.
+          </p><p>
+            Track your working hours by projects every day and invoice this time to your customers.
+          </p>
+        </field>
+    </record>
+	
+	<record id="hr_timesheet.timesheet_action_report_by_project" model="ir.actions.act_window">
+        <field name="name">Timesheets By Project</field>
+        <field name="res_model">account.analytic.line</field>
+        <field name="domain">[('project_id', '!=', False)]</field>
+        <field name="context">{'search_default_groupby_project': 1}</field>
+        <field name="search_view_id" ref="hr_timesheet_line_search_project"/>
+        <field name="help" type="html">
+          <p class="o_view_nocontent_smiling_face">
+            No activities found.
+          </p><p>
+            Track your working hours by projects every day and invoice this time to your customers.
+          </p>
+        </field>
+    </record>
+        
+	<record id="hr_timesheet.timesheet_action_report_by_task" model="ir.actions.act_window">
+        <field name="name">Timesheets By Task</field>
+        <field name="res_model">account.analytic.line</field>
+        <field name="domain">[('project_id', '!=', False)]</field>
+        <field name="context">{'search_default_groupby_project':1,'search_default_groupby_task':1,}</field>
+        <field name="search_view_id" ref="hr_timesheet_line_search_task"/>
+        <field name="help" type="html">
+          <p class="o_view_nocontent_smiling_face">
+            No activities found.
+          </p><p>
+            Track your working hours by projects every day and invoice this time to your customers.
+          </p>
+        </field>
+    </record>
+	
 </odoo>
