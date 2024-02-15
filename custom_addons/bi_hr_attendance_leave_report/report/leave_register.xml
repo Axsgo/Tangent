@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_leave_register">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <t t-foreach="docs" t-as="o">
+                    <div class="oe_structure"/>
+                    <div class="text-center">
+                        <h2>Employee Leaves</h2>
+                    </div>
+                    <br/>
+                    <table class="table table-bordered mt32">
+                        <thead>
+                            <tr>
+                                <th name="th_sno" class="text-left">
+                                    <span>S.No</span>
+                                </th>
+                                <th name="th_dept" class="text-left">
+                                    <span>Department</span>
+                                </th>
+                                <th name="th_emp_name" class="text-left">
+                                    <span>Name of Employee</span>
+                                </th>
+                                <th name="th_designation" class="text-left">
+                                    <span>Designation</span>
+                                </th>
+                                <th name="th_gender" class="text-left" t-att-colspan="o.leave_type_count">
+                                    <span>Allocated</span>
+                                </th>
+                                <th class="text-left" t-att-colspan="o.leave_type_count">
+                                    <span>Utilised</span>
+                                </th>
+                                <th class="text-left" t-att-colspan="o.leave_type_count">
+                                    <span>Remain</span>
+                                </th>
+                                <th class="text-left" t-att-colspan="o.leave_type_count">
+                                    <span>Total Leave Balance</span>
+                                </th>
+                            </tr>
+                            <tr>
+                                <td colspan="4">
+                                </td>
+                                <td class="text-left" t-foreach="o.get_leave_types()" t-as="leave">
+                                    <span t-esc="leave['leave_type']"/>
+                                </td>
+                                <td class="text-left" t-foreach="o.get_leave_types()" t-as="leave">
+                                    <span t-esc="leave['leave_type']"/>
+                                </td>
+                                <td class="text-left" t-foreach="o.get_leave_types()" t-as="leave">
+                                    <span t-esc="leave['leave_type']"/>
+                                </td>
+                            </tr>
+                        </thead>
+                        <t t-foreach="o.employee_ids" t-as="employee">
+                            <tr>
+                                <t t-set="total_leave" t-value="0"/>
+                                <td>
+                                    <span t-esc="employee_index+1"/>
+                                </td>
+                                <td>
+                                    <span t-field="employee.department_id"/>
+                                </td>
+                                <td>
+                                    <span t-esc="employee.name"/>
+                                </td>
+                                <td>
+                                    <span t-esc="employee.job_id.name"/>
+                                </td>
+                                <td t-foreach="o.get_leave_types()" t-as="leave_type">
+                                    <t t-foreach="o.get_leave_allocation()" t-as="allocation">
+                                        <t t-if="allocation['employee'] == employee.id">
+                                            <t t-if="allocation['leave_type'] == leave_type['leave_type_id']">
+                                                <span t-esc="allocation['duration']"/>
+                                            </t>
+                                        </t>
+                                    </t>
+                                </td>
+                                <td t-foreach="o.get_leave_types()" t-as="leave_type">
+                                    <t t-foreach="o.get_leave()" t-as="leave">
+                                        <t t-if="leave['employee'] == employee.id">
+                                            <t t-if="leave['leave_type'] == leave_type['leave_type_id']">
+                                                <span t-esc="leave['duration']"/>
+                                            </t>
+                                        </t>
+                                    </t>
+                                </td>
+                                <td t-foreach="o.get_leave_types()" t-as="leave_type">
+                                    <t t-foreach="o.get_remain_leave()" t-as="leave">
+                                        <t t-if="leave['employee'] == employee.id">
+                                            <t t-if="leave['leave_type'] == leave_type['leave_type_id']">
+                                                <span t-esc="leave['duration']"/>
+                                            </t>
+                                        </t>
+                                    </t>
+                                </td>
+                                <td>
+                                    <t t-foreach="o.get_total_leave()" t-as="leave">
+                                        <t t-if="leave['employee'] == employee.id">
+                                            <span t-esc="leave['duration']"/>
+                                        </t>
+                                    </t>
+                                </td>
+                            </tr>
+                        </t>
+                    </table>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>
+
+

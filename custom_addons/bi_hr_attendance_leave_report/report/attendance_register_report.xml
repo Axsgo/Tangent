@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="paperformat_attendance_register" model="report.paperformat">
+        <field name="name">Attendance Register</field>
+        <field name="default" eval="True"/>
+        <field name="format">custom</field>
+        <field name="orientation">Landscape</field>
+        <field name="page_height">650</field>
+        <field name="page_width">1000</field>
+        <field name="margin_top">15</field>
+        <field name="margin_bottom">10</field>
+        <field name="margin_left">10</field>
+        <field name="margin_right">0</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">0</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <record id="action_report_attendance_register" model="ir.actions.report">
+        <field name="name">Employee Attendance Report</field>
+        <field name="model">employee.attendance.register</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">bi_hr_attendance_leave_report.report_attendance_register</field>
+        <field name="report_file">bi_hr_attendance_leave_report.report_attendance_register</field>
+        <field name="paperformat_id" ref="bi_hr_attendance_leave_report.paperformat_attendance_register"/>
+        <field name="binding_model_id" ref="model_employee_attendance_register"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <record id="paperformat_leave_register" model="report.paperformat">
+            <field name="name">Leave Regsiter</field>
+            <field name="default" eval="True"/>
+            <field name="format">A4</field>
+            <field name="orientation">Landscape</field>
+            <field name="page_height">0</field>
+            <field name="page_width">0</field>
+            <field name="margin_top">0</field>
+            <field name="margin_bottom">0</field>
+            <field name="margin_left">0</field>
+            <field name="margin_right">0</field>
+            <field name="header_spacing">50</field>
+            <field name="dpi">90</field>
+    </record>
+
+    <record id="action_report_leave_register" model="ir.actions.report">
+        <field name="name">Employee leave Report</field>
+        <field name="model">employee.leave.register</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">bi_hr_attendance_leave_report.report_leave_register</field>
+        <field name="report_file">bi_hr_attendance_leave_report.report_leave_register</field>
+        <field name="paperformat_id" ref="bi_hr_attendance_leave_report.paperformat_leave_register"/>
+        <field name="binding_model_id" ref="model_employee_attendance_register"/>
+        <field name="binding_type">report</field>
+    </record>
+</odoo>

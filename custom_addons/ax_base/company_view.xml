@@ -21,20 +21,32 @@
                     <attribute name="string">VAT</attribute>
                 </field>
                 <page name="general_info" position="after">
-                    <page string="Timesheet Configurations" name="timesheet_settings">
+                    <page string="Alerts Settings" name="Alerts_settings">
                         <group>
-                            <group>
+                            <group string="Timesheet">
                                 <field name="timesheet_working_hrs" widget="float_time"/>
                                 <label for="timesheet_manager_alert"/>
                                 <div class="o_row">
                                     <field name="timesheet_manager_alert"/><span> - </span>
                                     <field name="timesheet_manager_nxt_date"/>
                                 </div>
-                                <label for="timesheet_admin_alert"/>
+                                <!-- <label for="timesheet_admin_alert"/>
                                 <div class="o_row">
                                     <field name="timesheet_admin_alert"/><span> - </span>
                                     <field name="timesheet_admin_nxt_date"/>
+                                </div> -->
+                            </group>
+                            <group string="Absent/Leave">
+                                <label for="absent_manager_alert"/>
+                                <div class="o_row">
+                                    <field name="absent_manager_alert"/><span> - </span>
+                                    <field name="absent_manager_nxt_date"/>
                                 </div>
+                            </group>
+                        </group>
+                        <group>
+                            <group string="Attendance">
+                                <field name="attend_work_hrs" widget="float_time"/>
                             </group>
                         </group>
                     </page>

@@ -3,7 +3,7 @@
     <data>
     	<!-- Form view -->
         <record id="ax_leave_form_view" model="ir.ui.view">
-            <field name="name">Employee Leave</field>
+            <field name="name">Absent</field>
             <field name="model">ax.leave</field>
             <field name="type">form</field>
             <field name="arch" type="xml">
@@ -24,12 +24,16 @@
 	                    		<label for="from_date" string="Dates"/>
 	                    		<div class="o_row o_row_readonly o_hr_holidays_dates">
 	                    			<span class="oe_inline">From</span>
-	                    			<field name="from_date" widget="daterange" no_label='1' class="oe_inline" options="{'related_end_date': 'to_date'}" attrs="{'readonly':[('state','!=','draft')]}"/>
-	                    			<span class="oe_inline">To</span>
-	                    			<field name="to_date" widget="daterange" no_label='1' class="oe_inline" options="{'related_start_date': 'from_date'}" attrs="{'readonly':[('state','!=','draft')]}"/>
+	                    			<field name="from_date" required='1' widget="daterange" no_label='1' class="oe_inline" options="{'related_end_date': 'to_date'}" attrs="{'readonly':[('state','!=','draft')]}"/>
+	                    			<span class="oe_inline" attrs="{'invisible':[('request_unit_half','=',True)]}">To</span>
+	                    			<field name="to_date" widget="daterange" no_label='1' class="oe_inline" options="{'related_start_date': 'from_date'}" attrs="{'readonly':[('state','!=','draft')],'invisible': [('request_unit_half', '=', True)]}"/>
+	                    			<field name="request_date_from_period" class="oe_inline" string="In"
+                                    options="{'horizontal': True}" attrs="{'required': [('request_unit_half', '=', True)], 'invisible': [('request_unit_half', '=', False)],'readonly':[('state','!=','draft')]}"/>
 	                    		</div>
+	                    		<field name="request_unit_half" attrs="{'readonly':[('state','!=','draft')]}"/>
 	                    		<field name="number_of_days" widget="timesheet_uom"/>
 	                    		<field name="description" widget="text" attrs="{'readonly':[('state','!=','draft')]}"/>
+	                    		<field name="is_leave_applied" invisible='1'/>
 	                    	</group>
 	                    	<group>
 	                    		<field name="entry_date" readonly='1' invisible='1'/>
@@ -48,7 +52,7 @@
 
 		<!-- Tree View -->
         <record id="ax_leave_tree_view" model="ir.ui.view">
-            <field name="name">Employee Leave</field>
+            <field name="name">Absent</field>
             <field name="model">ax.leave</field>
             <field name="type">tree</field>
             <field name="arch" type="xml">
@@ -64,7 +68,7 @@
         </record>
 
         <record id="ax_leave_calendar_view" model="ir.ui.view">
-	        <field name="name">Employee Leave</field>
+	        <field name="name">Absent</field>
 	        <field name="model">ax.leave</field>
 	        <field name="arch" type="xml">
 	            <calendar date_start="from_date" date_stop="to_date" color="employee_id" string="Description" date_delay="number_of_days" mode="month" event_limit="5" event_open_popup="true" form_view_id="%(ax_holidays.ax_leave_form_view)d" quick_add="False" show_unusual_days="True" delete="false">
@@ -82,7 +86,7 @@
         <!-- Search View Start -->
 	
 		<record id="ax_leave_search_view" model="ir.ui.view">
-			<field name="name">Employee Leave</field>
+			<field name="name">Absent</field>
 			<field name="model">ax.leave</field>
 			<field name="arch" type="xml">
 				<search string="Employee Leave">
@@ -100,7 +104,7 @@
 		<!-- Search View End -->
 
 	    <record id="action_ax_leave" model="ir.actions.act_window">  
-	        <field name="name">Employee Leave</field>
+	        <field name="name">Absent</field>
 	        <field name="type">ir.actions.act_window</field>
 	        <field name="res_model">ax.leave</field>
 	        <field name="view_mode">calendar,form,tree</field>
@@ -109,11 +113,11 @@
 	    </record>
 
 	    <!-- Menuitems -->
-		<menuitem name="Apply Employee Leave" id="pm_leave" parent="hr_holidays.menu_hr_holidays_root" action="action_ax_leave" sequence='0' groups="ax_groups.admin_user_group"/>
+		<menuitem name="Absent" id="pm_leave" parent="hr_holidays.menu_hr_holidays_root" action="action_ax_leave" sequence='0' groups="ax_groups.admin_user_group"/>
 
 	    <!-- Record Rule -->
 		<record id="rule_ax_leave" model="ir.rule">
-	        <field name="name">Employee Leave multi-company</field>
+	        <field name="name">Absent multi-company</field>
 	        <field name="model_id" ref="model_ax_leave"/>
 	        <field eval="True" name="global"/>
 	        <field name="domain_force">['|',('company_id','=',False),('company_id','in',company_ids)]</field>
@@ -178,6 +182,45 @@
 	                <field name="future_days"/>
 	            </xpath>
 	        </field>
+	    </record>
+
+	    <!-- Absent alert scheduler -->
+	    <record id="ax_absent_alert_scheduler" model="ir.cron">
+	        <field name="name">Employee Absent Alert Scheduler</field>
+	        <field name="model_id" ref="model_ax_leave"/>
+	        <field name="state">code</field>
+	        <field name="code">model._entry_employee_absent_alert()</field>
+	        <field name="interval_number">1</field>
+	        <field name="interval_type">days</field>
+	        <field name="numbercall">-1</field>
+	        <field name="active">True</field>
+	        <field name="doall" eval="False"/>
+	    </record>
+
+	    <!-- Absent Alerts Mail -->
+	    <record id="email_template_absent_alert" model="mail.template">
+	        <field name="name">Employee Absent Alert</field>
+	        <field name="model_id" ref="model_ax_leave"/>
+	        <field name="email_from">${ctx['email_from'] |safe}</field>
+	        <field name="email_to">${ctx['email_to'] |safe}</field>
+	        <field name="email_cc">${ctx['email_cc'] |safe}</field>
+	        <field name="subject">${ctx['subject']}</field>
+	        <field name="body_html" type="html">
+	            <div style="margin: 0px; padding: 0px;">
+	                <p style="margin: 0px; padding: 0px; font-size: 13px;">
+	                    Dear <b>${object.employee_id.name}</b>,
+	                    <br></br>
+	                    <br></br>
+	                    This is to inform you that you were marked as absent for the following date <b>${object.from_date.strftime("%d/%m/%Y")}</b> according to our records. If this is accurate, we kindly request you to formally apply for leave through our leave management system.
+	                    <br/><br/>
+	                    If you have already applied for leave or if there are any discrepancies, please disregard this notification. However, if you have not yet applied for leave, it's essential to do so to maintain accurate records and ensure proper coverage for your absence.
+	                    <br/><br/>
+	                    Please note: This is an automated message, and there is no need to reply to this email.
+	                </p>
+	            </div>
+	        </field>
+	        <field name="lang">${object.employee_id.user_id.lang}</field>
+	        <field name="auto_delete" eval="True"/>
 	    </record>
 	</data>
 </openerp>

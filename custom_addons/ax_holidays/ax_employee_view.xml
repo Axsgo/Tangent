@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+	<!-- manager absent alert Scheduler -->
+    <record id="ax_manager_absent_alert_scheduler" model="ir.cron">
+        <field name="name">Manager Absent Alert Scheduler</field>
+        <field name="model_id" ref="model_hr_employee"/>
+        <field name="state">code</field>
+        <field name="code">model._entry_manager_absent_alert()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="active">True</field>
+        <field name="doall" eval="False"/>
+    </record>
+
+    <record id="email_template_manager_absent_alert" model="mail.template">
+        <field name="name">Manager Absent Alert</field>
+        <field name="model_id" ref="model_hr_employee"/>
+        <field name="email_from">${ctx['email_from'] |safe}</field>
+        <field name="email_to">${ctx['email_to'] |safe}</field>
+        <field name="email_cc">${ctx['email_cc'] |safe}</field>
+        <field name="subject">${ctx['subject']}</field>
+        <field name="body_html" type="html">
+            <div style="margin: 0px; padding: 0px;">
+                Dear <b>${object.name}</b>,
+                <br></br>
+                <br></br>
+            	This is to inform you that below employees were marked as absent for the following date according to our records. If this is accurate, we kindly request you to follow the employees to apply for leave through our leave management system.
+            	<br/><br/>
+            	% set emp_ids = ctx['emp_ids']
+            	<ol type="1">
+            	% for emp in emp_ids:
+            		<li>
+            			<h4>${emp.name}</h4>
+            			% set dates = object.get_absent_dates(emp)
+            			%if dates:
+            				<ol type="1">
+            					% for date in dates:
+            						<li>${date.strftime("%d/%m/%Y")}</li>
+            					%endfor
+            				</ol>
+            			%endif
+            		</li>
+            	% endfor
+                </ol>
+            	<br/><br/>
+                Please note: This is an automated message, and there is no need to reply to this email.
+            </div>
+        </field>
+        <field name="lang">${object.user_id.lang}</field>
+        <field name="auto_delete" eval="True"/>
+    </record>
+</odoo>

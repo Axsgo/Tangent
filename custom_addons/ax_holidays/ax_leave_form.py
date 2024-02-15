@@ -14,6 +14,8 @@ class AxLeave(models.Model):
 
 	from_date = fields.Date("From Date",default=fields.Date.today,tracking=True)
 	to_date = fields.Date("To Date",default=fields.Date.today,tracking=True)
+	request_date_from_period = fields.Selection([('am','Morning'),('pm','Afternoon')],default="am",string="Period")
+	request_unit_half = fields.Boolean("Half Day",copy=False)
 	employee_id = fields.Many2one("hr.employee",'Employee',tracking=True,required=True)
 	holiday_status_id = fields.Many2one("hr.leave.type",'Time Off Type',tracking=True)
 	number_of_days = fields.Float("Duration",compute='_get_number_of_days',store=True,tracking=True)
@@ -22,14 +24,19 @@ class AxLeave(models.Model):
 	user_id = fields.Many2one("res.users",'Created By',default=lambda self:self.env.user.id)
 	company_id = fields.Many2one("res.company",'Company',default=lambda self:self.env.company.id)
 	entry_date = fields.Date("Entry Date",default=fields.Date.today)
+	is_leave_applied = fields.Boolean("Is Leave Applied?")
 	state = fields.Selection([('draft','Draft'),('confirm','Apply'),('cancel','Cancalled')],default='draft',string="Status",tracking=True)
 
-	@api.depends('from_date','to_date')
+	@api.depends('from_date','to_date','request_unit_half')
 	def _get_number_of_days(self):
 		for rec in self:
-			if self.from_date and self.to_date:
-				day_diff = ((self.to_date-self.from_date).days)+1
-				rec.number_of_days = day_diff
+			if rec.request_unit_half == True:
+				if rec.from_date:
+					rec.number_of_days = 12
+			else:
+				if rec.from_date and rec.to_date:
+					day_diff = ((rec.to_date-rec.from_date).days)+1
+					rec.number_of_days = day_diff
 
 	def entry_confirm(self):
 		if self.state == 'draft':
@@ -49,7 +56,24 @@ class AxLeave(models.Model):
 
 		works = {d[0].date() for d in calendar._work_intervals_batch(dfrom, dto)[False]}
 		return {fields.Date.to_string(day.date()): (day.date() not in works) for day in rrule(DAILY, dfrom, until=dto)}
-	
+
+	def _entry_employee_absent_alert(self):
+		absent_ids = self.env['ax.leave'].search([('from_date','<=',datetime.now().date()),('state','=','confirm'),
+			('is_leave_applied','=',False)])
+		for leave in absent_ids:
+			leave_id = self.env['hr.leave'].search([('employee_id','=',leave.employee_id.id),
+				('request_date_from','=',leave.from_date)])
+			if leave_id:
+				leave.is_leave_applied = True
+			else:
+				if (datetime.now().date() - leave.from_date).days >=2:
+					context = {
+						'email_to':leave.employee_id.user_id.email,
+						'email_from':self.env.company.erp_email,
+						'subject': "System Notification: Request to apply Leave on %s"%(leave.from_date.strftime("%d/%m/%Y")),
+					}
+					template = self.env['ir.model.data'].get_object('ax_holidays','email_template_absent_alert')
+					self.env['mail.template'].browse(template.id).with_context(context).send_mail(leave.id,force_send=True)
 	
 class CalendarLeaves(models.Model):
 	_inherit = "resource.calendar.leaves"

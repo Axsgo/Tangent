@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+employee_attendance_register,employee.attendance.register,model_employee_attendance_register,,1,1,1,1
+employee_leave_register,employee.leave.register,model_employee_leave_register,,1,1,1,1

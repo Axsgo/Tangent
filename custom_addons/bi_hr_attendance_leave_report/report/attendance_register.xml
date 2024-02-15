@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_attendance_register">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <t t-foreach="docs" t-as="o">
+                        <div class="oe_structure"/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <div class="text-center">
+                            <h2>Employee Attendance</h2>
+                        </div>
+                        <br/>
+                        <table class="table table-bordered mt32" style="font-size: 13px;">
+                            <thead>
+                                <tr>
+                                    <th name="th_sno" class="text-left">
+                                        <span>S.No</span>
+                                    </th>
+                                    <th name="th_dept" class="text-left">
+                                        <span>Department</span>
+                                    </th>
+                                    <th name="th_emp_name" class="text-left">
+                                        <span>Name of Employee</span>
+                                    </th>
+                                    <th name="th_designation" class="text-left">
+                                        <span>Designation</span>
+                                    </th>
+                                    <th name="th_gender" class="text-left">
+                                        <span>Gender</span>
+                                    </th>
+                                    <th colspan="35" name="th_date" class="text-left">
+                                        <span>Dates</span>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <td colspan="5">
+                                    </td>
+                                    <td t-foreach="o.get_data()" t-as="line">
+                                        <span t-esc="line['date_list']"/>
+                                    </td>
+                                </tr>
+                            </thead>
+                            <t t-foreach="o.employee_ids" t-as="employee">
+                                <tr>
+                                    <td>
+                                        <span t-esc="employee_index+1"/>
+                                    </td>
+                                    <td>
+                                        <span t-field="employee.department_id"/>
+                                    </td>
+                                    <td>
+                                        <span t-esc="employee.name"/>
+                                    </td>
+                                    <td>
+                                        <span t-esc="employee.job_id.name"/>
+                                    </td>
+                                    <td>
+                                        <span t-esc="employee.gender"/>
+                                    </td>
+                                    <td t-foreach="o.get_data()" t-as="date">
+                                        <t t-set="attn_date"/>
+                                        <t t-foreach="o.check_attendance()" t-as="attendance">
+                                            <t t-if="attendance['employee'] == employee.id">
+                                                <t t-if="attendance['date'] == date['date_list']">
+                                                    <t t-set="attn_date" t-value="attendance['date']"/>
+                                                    <span t-esc="attendance['state']"/>
+                                                </t>
+                                            </t>
+                                        </t>
+                                        <t t-if="date['date_list'] != attn_date">
+                                            <span t-esc="o.absent"/>
+                                        </t>
+                                    </td>
+                                </tr>
+                            </t>
+                        </table>
+                    </t>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>
+
+

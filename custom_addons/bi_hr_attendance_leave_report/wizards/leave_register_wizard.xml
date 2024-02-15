@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="leave_register_wizard_form" model="ir.ui.view">
+                <field name="name">Leave Register Wizard</field>
+                <field name="model">employee.leave.register</field>
+                <field name="type">form</field>
+                <field name="arch" type="xml">
+                    <form string="Leave Register Wizard ">
+                        <sheet>
+                          <group>
+                                <group>
+                                    <field name="leave_type_count" invisible="1"/>
+                                    <field name="dept_id"/>
+                                    <field name="employee_ids" widget="many2many_tags"/>
+                                </group>
+                                <group>
+                                    <field name="start_date"/>
+                                    <field name="end_date"/>
+                                </group>
+                          </group>
+                        </sheet>
+                        <footer>
+                          <button name="print_pdf" string="Print PDF" type="object" class="btn-primary"/>
+                          <button string="Cancel" class="btn-secondary" special="cancel"/>
+                        </footer>
+                    </form>
+                </field>
+        </record>
+        <record id="wizard_action_leave_register" model="ir.actions.act_window">
+                <field name="name">Employee Leave Register</field>
+                <field name="type">ir.actions.act_window</field>
+                <field name="res_model">employee.leave.register</field>
+                <field name="view_mode">form</field>
+                <field name="target">new</field>
+        </record>
+
+        <menuitem parent="hr.hr_menu_hr_reports" name="Employee Leave Register"
+                              action="wizard_action_leave_register" id="menu_leave_register"
+                              sequence="700"/>
+    </data>
+</odoo>
