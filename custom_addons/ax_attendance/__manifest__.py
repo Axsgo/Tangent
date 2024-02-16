@@ -9,8 +9,9 @@
     'data': [
     'ir.model.access.csv',
     'ax_attendance_view.xml',
+    'ax_employee_view.xml',
     ],
-    'depends': ['base','hr','hr_attendance','ax_base','ax_groups'],
+    'depends': ['base','hr','hr_attendance','ax_base','ax_groups','sttl_timesheet_calendar'],
     'installable': True,
     'auto_install': False,
     'application': True,

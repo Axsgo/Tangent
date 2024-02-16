@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+	<!-- Daily scheduler -->
+    <record id="hr_attendance_daily_alert_scheduler" model="ir.cron">
+        <field name="name">Attendance Daily Alert Scheduler</field>
+        <field name="model_id" ref="hr.model_hr_employee"/>
+        <field name="state">code</field>
+        <field name="code">model._alert_daily_attendance()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="active">True</field>
+        <field name="doall" eval="False"/>
+    </record>
+
+    <record id="email_template_daily_attendance_alert" model="mail.template">
+        <field name="name">Employee Attendace Daily Alert</field>
+        <field name="model_id" ref="hr.model_hr_employee"/>
+        <field name="email_from">${ctx['email_from'] |safe}</field>
+        <field name="email_to">${ctx['email_to'] |safe}</field>
+        <field name="email_cc">${ctx['email_cc'] |safe}</field>
+        <field name="subject">System Notification: Daily Attendance Alert</field>
+        <field name="body_html" type="html">
+            <div style="margin: 0px; padding: 0px;">
+                <p style="margin: 0px; padding: 0px; font-size: 13px;">
+                	Dear <b>${object.display_name}</b>,
+                    <br/><br/>
+                    This is to inform you that your work hours on <b>${ctx['sterday']}</b> - (<b>${ctx['float_time']}hrs</b>) has fallen below our company norms (<b>${ctx['actual_time']}hrs</b>).Consistent attendance is essential for maintaining productivity and team cohesion.
+                    <br/><br/>
+                    Please ensure that your attendance meets our company standards moving forward. If you encounter any challenges or require assistance, please don't hesitate to reach out to your supervisor or HR representative.
+                    <br/><br/>
+                    Please note: This is an automated message, and there is no need to reply to this email.
+                </p>
+            </div>
+        </field>
+        <field name="lang">${object.user_id.lang}</field>
+        <field name="auto_delete" eval="True"/>
+    </record>
+
+    <!-- Weekly scheduler -->
+    <record id="hr_attendance_weekly_alert_scheduler" model="ir.cron">
+        <field name="name">Attendance Weekly Alert Scheduler</field>
+        <field name="model_id" ref="hr.model_hr_employee"/>
+        <field name="state">code</field>
+        <field name="code">model._alert_weekly_attendance()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="active">True</field>
+        <field name="doall" eval="False"/>
+    </record>
+
+    <record id="email_template_weekly_attendance_alert" model="mail.template">
+        <field name="name">Employee Attendance Weekly Alert</field>
+        <field name="model_id" ref="hr.model_hr_employee"/>
+        <field name="email_from">${ctx['email_from'] |safe}</field>
+        <field name="email_to">${ctx['email_to'] |safe}</field>
+        <field name="email_cc">${ctx['email_cc'] |safe}</field>
+        <field name="subject">System Notification: Weekly Attendance Alert</field>
+        <field name="body_html" type="html">
+            <div style="margin: 0px; padding: 0px;">
+                <p style="margin: 0px; padding: 0px; font-size: 13px;">
+                	Dear <b>${object.display_name}</b>,
+                    <br/><br/>
+                    This is to inform you that your weekly average work hours between <b>${ctx['start_date']} - ${ctx['end_date']}</b> - (<b>${ctx['float_time']}hrs</b>) has fallen below our company norms (<b>${ctx['actual_time']}hrs</b>).Consistent attendance is essential for maintaining productivity and team cohesion.
+                    <br/><br/>
+                    Please ensure that your attendance meets our company standards moving forward. If you encounter any challenges or require assistance, please don't hesitate to reach out to your supervisor or HR representative.
+                    <br/><br/>
+                    Please note: This is an automated message, and there is no need to reply to this email.
+                </p>
+            </div>
+        </field>
+        <field name="lang">${object.user_id.lang}</field>
+        <field name="auto_delete" eval="True"/>
+    </record>
+
+        <!-- Monthly scheduler -->
+	    <!-- <record id="hr_attendance_monthly_alert_scheduler" model="ir.cron">
+            <field name="name">Attendance Monthly Alert Scheduler</field>
+            <field name="model_id" ref="hr_attendance.model_hr_attendance"/>
+            <field name="state">code</field>
+            <field name="code">model._alert_monthly_attendance()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="active">True</field>
+            <field name="doall" eval="False"/>
+        </record>
+
+        <record id="email_template_monthly_attendance_alert" model="mail.template">
+            <field name="name">Employee Timesheet Monthly Alert</field>
+            <field name="model_id" ref="hr.model_hr_employee"/>
+            <field name="email_from">${ctx['email_from'] |safe}</field>
+            <field name="email_to">${ctx['email_to'] |safe}</field>
+            <field name="email_cc">${ctx['email_cc'] |safe}</field>
+            <field name="subject">Employee Timesheet Monthly Alert</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px;">
+                    <p style="margin: 0px; padding: 0px; font-size: 13px;">
+                    	Dear ${object.display_name},
+                        <br></br>
+                        <br></br>
+                        Your monhtly average work hours between <b>${ctx['start_date']} - ${ctx['end_date']}</b> was <b>${ctx['float_time']}hrs</b> which was less than <b>09:00hrs</b> as per company norms.
+                        <br></br>
+                        <br></br>
+                        Please feel free to contact us if you have any questions.
+                    </p>
+                </div>
+            </field>
+            <field name="lang">${object.user_id.lang}</field>
+            <field name="auto_delete" eval="True"/>
+        </record> -->
+</odoo>
