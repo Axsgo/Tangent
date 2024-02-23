@@ -75,39 +75,52 @@
     </record>
 
         <!-- Monthly scheduler -->
-	    <!-- <record id="hr_attendance_monthly_alert_scheduler" model="ir.cron">
-            <field name="name">Attendance Monthly Alert Scheduler</field>
-            <field name="model_id" ref="hr_attendance.model_hr_attendance"/>
-            <field name="state">code</field>
-            <field name="code">model._alert_monthly_attendance()</field>
-            <field name="interval_number">1</field>
-            <field name="interval_type">days</field>
-            <field name="numbercall">-1</field>
-            <field name="active">True</field>
-            <field name="doall" eval="False"/>
-        </record>
+    <record id="hr_attendance_monthly_alert_scheduler" model="ir.cron">
+        <field name="name">Attendance Monthly Alert Scheduler</field>
+        <field name="model_id" ref="hr.model_hr_employee"/>
+        <field name="state">code</field>
+        <field name="code">model._alert_monthly_attendance()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">months</field>
+        <field name="numbercall">-1</field>
+        <field name="active">True</field>
+        <field name="doall" eval="False"/>
+    </record>
 
-        <record id="email_template_monthly_attendance_alert" model="mail.template">
-            <field name="name">Employee Timesheet Monthly Alert</field>
-            <field name="model_id" ref="hr.model_hr_employee"/>
-            <field name="email_from">${ctx['email_from'] |safe}</field>
-            <field name="email_to">${ctx['email_to'] |safe}</field>
-            <field name="email_cc">${ctx['email_cc'] |safe}</field>
-            <field name="subject">Employee Timesheet Monthly Alert</field>
-            <field name="body_html" type="html">
-                <div style="margin: 0px; padding: 0px;">
-                    <p style="margin: 0px; padding: 0px; font-size: 13px;">
-                    	Dear ${object.display_name},
-                        <br></br>
-                        <br></br>
-                        Your monhtly average work hours between <b>${ctx['start_date']} - ${ctx['end_date']}</b> was <b>${ctx['float_time']}hrs</b> which was less than <b>09:00hrs</b> as per company norms.
-                        <br></br>
-                        <br></br>
-                        Please feel free to contact us if you have any questions.
-                    </p>
-                </div>
-            </field>
-            <field name="lang">${object.user_id.lang}</field>
-            <field name="auto_delete" eval="True"/>
-        </record> -->
+    <record id="email_template_monthly_attendance_alert" model="mail.template">
+        <field name="name">Employee Timesheet Monthly Alert</field>
+        <field name="model_id" ref="hr.model_hr_employee"/>
+        <field name="email_from">${ctx['email_from'] |safe}</field>
+        <field name="email_to">${ctx['email_to'] |safe}</field>
+        <field name="subject">Employee Timesheet Monthly Alert</field>
+        <field name="body_html" type="html">
+            <div style="margin: 0px; padding: 0px;">
+                Dear ${ctx['name']},
+                <br></br>
+                <br></br>
+            	We would like to bring to your attention that the following employees have not ${ctx['actual_time']}hours, their attendance on the listed days.
+            	<br/><br/>
+            	% set emp_list = ctx['emp_list']
+            	<ol type="1">
+            	% for emp in emp_list:
+            		<li>
+            			<h4>${emp['emp']}</h4>
+            			% set dates = emp['less_avg']
+            			%if dates:
+            				<ul type="1">
+            					% for date in dates:
+            						<li>${date['date']} - ${date['hour']}</li>
+            					%endfor
+            				</ul>
+            			%endif
+            		</li>
+            	% endfor
+                </ol>
+            	<br/><br/>
+                Please note: This is an automated message, and there is no need to reply to this email.
+            </div>
+        </field>
+        <field name="lang">${object.user_id.lang}</field>
+        <field name="auto_delete" eval="True"/>
+    </record>
 </odoo>
