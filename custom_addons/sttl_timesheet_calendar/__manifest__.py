@@ -22,6 +22,7 @@
         'views/hr_timesheet_submit_view.xml',
         'views/project_project_view.xml',
         'views/hr_timesheet_submit_report_view.xml',
+        'views/project_profit_report_view.xml',
         'views/hr_employee_view.xml',
     ],
     'installable': True,

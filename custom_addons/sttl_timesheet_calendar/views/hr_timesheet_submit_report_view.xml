@@ -9,16 +9,18 @@
             <field name="arch" type="xml">
 				<form string="Timesheet Submit Report">
 					<group>
-						<!--<field name="submit_ids" options="{'no_create': True}" widget="many2many_tags" required="1"/>-->
+						<field name="report_type" widget="radio"/>
+					</group>
+					<group>
 						<group>
 							<field name="from_date" required="1"/>
-							<field name="submit_status" required="1"/>
+							<field name="submit_status" attrs="{'invisible':[('report_type','=','xl')],'required':[('report_type','=','list')]}"/>
 						</group>
 						<group>
 							<field name="to_date" required="1"/>
 						</group>
 					</group>
-					<group>
+					<group attrs="{'invisible':[('report_type','=','xl')]}">
 						<field name="line_ids" nolabel="1" readonly="1" >
 							<tree limit="2000">
 								<field name="submit_id" string="Week"/>
@@ -28,6 +30,8 @@
 						</field>
 					</group>
 					<footer>
+						<button name="action_xls_report" type="object" string="Download Excel" class="oe_highlight"
+							attrs="{'invisible':[('report_type','=','list')]}"/>
 					</footer>
 				</form>
             </field>

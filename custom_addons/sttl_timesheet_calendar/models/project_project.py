@@ -10,6 +10,7 @@ class ProjectProject(models.Model):
 	timesheet_count = fields.Integer("Timesheet Count",compute="_get_timesheet_count")
 	timesheet_duration = fields.Float("Timesheet Durations(HH:MM)",compute="_get_timesheet_duration")
 	is_project_start_mail_sent = fields.Boolean("Project Start Mail Sent?",default=False,copy=False)
+	stage_cost_ids = fields.One2many('project.cost.stage','project_id',string='Stage wise cost')
 	
 	@api.onchange('allowed_stage_ids')
 	def onchange_project_id(self):
@@ -34,3 +35,14 @@ class ProjectProject(models.Model):
 			else:
 				rec.timesheet_duration = 0
 				
+
+class ProjectCostStage(models.Model):
+	_name = "project.cost.stage"
+	_description = "Project Cost Stage"
+	
+	project_id = fields.Many2one('project.project', "Project")
+	allowed_stage_ids = fields.Many2many(related='project_id.allowed_stage_ids',string='Stages')
+	stage_id = fields.Many2one("hr.timesheet.status",'Stages',domain="[('id', 'in', allowed_stage_ids)]",required=True)
+	amount = fields.Float('Amount')
+	
+	

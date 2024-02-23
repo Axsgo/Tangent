@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+    	<!--project profit report-->	
+    	<record id="project_profit_report_form_view" model="ir.ui.view">
+            <field name="name">Project Profit Report</field>
+            <field name="model">project.profit.report</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+				<form string="Project Profit Report">
+					<group>
+						<field name="project_ids" widget="many2many_tags" required="1"/>
+						<field name="report_type" widget="radio"/>
+					</group>
+					<footer>
+						<button name="action_xls_report" type="object" string="Download Excel" class="oe_highlight"/>
+					</footer>
+				</form>
+            </field>
+        </record>
+
+    	<record id="action_project_profit_report" model="ir.actions.act_window">  
+            <field name="name">Project Profit Report</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">project.profit.report</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+    	<menuitem name="Project Hours/Profit Report" id="project_profit_report" parent="project.menu_project_report" 
+    		action="action_project_profit_report" sequence='12'/>
+    		
+    </data>
+</odoo>

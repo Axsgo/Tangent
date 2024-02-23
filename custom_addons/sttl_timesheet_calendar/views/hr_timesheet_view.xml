@@ -256,7 +256,6 @@
                 <separator/>
                 <filter name="month" string="Date" date="date"/>
                 <group expand="0" string="Group By">
-                    <filter string="Date" name="groupby_date" domain="[]" context="{'group_by': 'date'}" help="Timesheet by Date"/>
                     <filter string="Department" name="groupby_department" domain="[]" context="{'group_by': 'department_id'}"/>
                     <filter string="Employee" name="groupby_employee" domain="[]" context="{'group_by': 'employee_id'}"/>
                 </group>
@@ -269,7 +268,6 @@
         <field name="model">account.analytic.line</field>
         <field name="arch" type="xml">
             <search string="Timesheet">
-                <field name="date"/>
                 <field name="project_id"/>
                 <separator/>
                 <filter name="month" string="Date" date="date"/>
@@ -286,7 +284,6 @@
         <field name="model">account.analytic.line</field>
         <field name="arch" type="xml">
             <search string="Timesheet">
-                <field name="date"/>
                 <field name="task_id"/>
                 <separator/>
                 <filter name="month" string="Date" date="date"/>

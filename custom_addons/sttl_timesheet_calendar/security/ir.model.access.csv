@@ -11,3 +11,5 @@ access_hr_timesheet_status,hr.timesheet.status,model_hr_timesheet_status,ax_grou
 access_hr_timesheet_status_emp,hr.timesheet.status,model_hr_timesheet_status,base.group_user,1,0,0,0
 hr_timesheet.access_project_project,project.project.timesheet.user,hr_timesheet.model_project_project,hr_timesheet.group_hr_timesheet_user,1,1,0,0
 project.access_project_task,project.task,project.model_project_task,project.group_project_user,1,1,0,0
+access_project_cost_stage,project.cost.stage,model_project_cost_stage,base.group_user,1,1,1,1
+access_project_profit_report,project.profit.report,model_project_profit_report,base.group_user,1,1,1,1

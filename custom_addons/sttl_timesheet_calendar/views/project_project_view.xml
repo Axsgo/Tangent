@@ -11,6 +11,13 @@
 				</xpath>
 				<xpath expr="//field[@name='company_id']" position="after">
 					<field name="allowed_stage_ids" widget="many2many_checkboxes" options="{'no_create': True}"/>
+					<field name="stage_cost_ids" groups="account.group_account_invoice">
+						<tree editable="bottom">
+							<field name="allowed_stage_ids" widget="many2many_checkboxes" invisible="1"/>
+							<field name="stage_id" options="{'no_create': True}"/>
+							<field name="amount" />
+						</tree>
+					</field>
 				</xpath>
             </field>
         </record>
