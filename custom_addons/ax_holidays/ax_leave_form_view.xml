@@ -31,7 +31,7 @@
                                     options="{'horizontal': True}" attrs="{'required': [('request_unit_half', '=', True)], 'invisible': [('request_unit_half', '=', False)],'readonly':[('state','!=','draft')]}"/>
 	                    		</div>
 	                    		<field name="request_unit_half" attrs="{'readonly':[('state','!=','draft')]}"/>
-	                    		<field name="number_of_days" widget="timesheet_uom"/>
+	                    		<!--<field name="number_of_days" widget="timesheet_uom"/>-->
 	                    		<field name="description" widget="text" attrs="{'readonly':[('state','!=','draft')]}"/>
 	                    		<field name="is_leave_applied" invisible='1'/>
 	                    	</group>
@@ -41,6 +41,7 @@
 	                    	</group>
 	                    </group>
 					</sheet>
+					<footer></footer>
 					<div class="oe_chatter">
                        <field name="message_follower_ids" widget="mail_followers"/>
                        <field name="activity_ids" widget="mail_activity"/>
@@ -92,6 +93,8 @@
 				<search string="Employee Leave">
 					<field name="employee_id" string="Employee"  filter_domain="[('employee_id','ilike',self)]" />
 					<!--<field name="holiday_status_id" string="Time Off Type"  filter_domain="[('holiday_status_id','ilike',self)]" />-->
+					<filter name="applied" string="Leave Applied" domain="[('is_leave_applied','=',True)]"/>
+					<filter name="not_applied" string="Leave Not Applied" domain="[('is_leave_applied','=',False)]"/>
 					<group expand="0" string="Group By...">
 						<filter name="employee" string="Employee" domain="[]" context="{'group_by':'employee_id'}"/> 
 						<!--<filter name="holiday_status" string="Time Off Type" domain="[]" context="{'group_by':'holiday_status_id'}"/>--> 
@@ -127,9 +130,9 @@
 	        <field name="name">hr.leave.view.dashboard</field>
 	        <field name="model">hr.leave</field>
 	        <field name="arch" type="xml">
-	            <calendar string="Time Off Request" form_view_id="%(hr_holidays.hr_leave_view_form_dashboard)d" event_open_popup="true" date_start="date_from" date_stop="date_to" mode="month" quick_add="False" show_unusual_days="True" color="holiday_status_id" hide_time="True">
+	            <calendar string="Leave Request" form_view_id="%(hr_holidays.hr_leave_view_form_dashboard)d" event_open_popup="true" date_start="date_from" date_stop="date_to" mode="month" quick_add="False" show_unusual_days="True" color="holiday_status_id" hide_time="True">
 	                <field name="display_name"/>
-	                <field name="holiday_status_id" invisible="1"/>
+	                <field name="holiday_status_id" invisible="1" filters="1"/>
 	                <field name="state" invisible="1"/>
 	            </calendar>
 	        </field>
@@ -139,9 +142,9 @@
 	        <field name="name">hr.leave.view.calendar</field>
 	        <field name="model">hr.leave</field>
 	        <field name="arch" type="xml">
-	            <calendar string="Time Off Request" event_open_popup="true" date_start="date_from" date_stop="date_to" mode="month" quick_add="False" color="employee_id">
+	            <calendar string="Leave Request" event_open_popup="true" date_start="date_from" date_stop="date_to" mode="month" quick_add="False" color="holiday_status_id">
 	                <field name="display_name"/>
-	                <field name="holiday_status_id" invisible="1"/>
+	                <field name="holiday_status_id" invisible="1" filters="1"/>
 	                <field name="employee_id" invisible="1"/>
 	            </calendar>
 	        </field>
@@ -169,6 +172,9 @@
 					</div>
 	                <field name="message" invisible="1"/>
 	            </xpath>
+	            <xpath expr="//field[@name='name']" position="after">
+					<field name="dr_certificate" />
+				</xpath>
 	        </field>
 	    </record>
 	    
@@ -183,6 +189,25 @@
 	            </xpath>
 	        </field>
 	    </record>
+	    
+	    <record id="hr_leave_action_action_approve_department_approve" model="ir.actions.act_window">
+	        <field name="name">Approve Leave</field>
+	        <field name="res_model">hr.leave</field>
+	        <field name="view_mode">tree,kanban,form,calendar,activity</field>
+	        <field name="search_view_id" ref="hr_holidays.hr_leave_view_search_manager"/>
+	        <field name="context">{'hide_employee_name': 1}</field>
+	        <field name="domain">[('state', '=', 'confirm')]</field>
+	        <field name="help" type="html">
+	            <p class="o_view_nocontent_smiling_face">
+	                Meet the Leave dashboard.
+	            </p><p>
+	                A great way to keep track on employee’s PTOs, sick days, and approval status.
+	            </p>
+	        </field>
+	    </record>
+	    
+	    <menuitem id="menu_open_department_leave_approve_state" name="Approve Leave" sequence="2"
+	        parent="hr_holidays.menu_hr_holidays_approvals" action="hr_leave_action_action_approve_department_approve"/>
 
 	    <!-- Absent alert scheduler -->
 	    <record id="ax_absent_alert_scheduler" model="ir.cron">

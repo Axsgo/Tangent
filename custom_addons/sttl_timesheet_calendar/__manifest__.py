@@ -12,7 +12,7 @@
     'price': 00,
     'currency': 'EUR',
     'depends': [
-        'base','resource','hr_timesheet','ax_base','mt_project_estimation'
+        'base','resource','hr_timesheet','ax_base','mt_project_estimation','web'
     ],
     'data': [
         'data/timesheet_submission_scheduler.xml',
@@ -24,6 +24,9 @@
         'views/hr_timesheet_submit_report_view.xml',
         'views/project_profit_report_view.xml',
         'views/hr_employee_view.xml',
+    ],
+    'qweb': [
+        "static/src/xml/web_calendar.xml",
     ],
     'installable': True,
     'application': True,

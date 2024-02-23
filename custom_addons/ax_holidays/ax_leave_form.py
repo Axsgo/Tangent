@@ -86,6 +86,7 @@ class HrLeave(models.Model):
 	_inherit = "hr.leave"
 	
 	message = fields.Text('Message')
+	dr_certificate = fields.Binary("Doctor Certificate")
 	
 	@api.onchange('holiday_status_id')
 	def _onchange_holiday_status_id(self):
@@ -108,7 +109,19 @@ class HrLeave(models.Model):
 		if type_id.future_days == True:
 			if parser.parse(vals.get('request_date_from')).date()>date.today() or parser.parse(vals.get('request_date_to')).date()>date.today():
 				raise UserError(_("You can't apply leave for future date"))
+		if type_id.code == 'SL' and not vals.get('dr_certificate'):
+			days = parser.parse(vals.get('request_date_to')).date() - parser.parse(vals.get('request_date_from')).date()
+			if days.days > 0 or parser.parse(vals.get('request_date_from')).strftime('%A') in ('Monday','Friday') or parser.parse(vals.get('request_date_to')).strftime('%A') in ('Monday','Friday'):
+				raise UserError(_("Kindly attach the Doctor Certificate, then submit the leave request."))
 		return super(HrLeave, self).create(vals)
+	
+	def write(self, vals):
+		res = super(HrLeave, self).write(vals)
+		if self.holiday_status_id.code == 'SL' and not self.dr_certificate:
+			days = self.request_date_to - self.request_date_from
+			if days.days > 0 or self.request_date_from.strftime('%A') in ('Monday','Friday') or self.request_date_to.strftime('%A') in ('Monday','Friday'):
+				raise UserError(_("Kindly attach the Doctor Certificate, then submit the leave request."))
+		return res
 	
 	
 class HrLeaveType(models.Model):

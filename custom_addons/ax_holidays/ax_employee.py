@@ -47,3 +47,8 @@ class Employee(models.Model):
 				if not leave_id:
 					dates.append(leave.from_date)
 			return dates
+		
+	@api.onchange('parent_id')
+	def _onchange_manager_approver(self):
+		self.leave_manager_id = self.parent_id.user_id.id
+			
