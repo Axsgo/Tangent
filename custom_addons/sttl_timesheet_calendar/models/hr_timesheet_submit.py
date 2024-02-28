@@ -69,7 +69,7 @@ class HrTimesheetSubmit(models.Model):
 class HrTimesheetSubmitLine(models.Model):
     _name = "hr.timesheet.submit.line"
     _description = "Submit Timesheet"
-    _order = "employee_id asc"
+    _order = "employee_id asc,submit_id desc"
     
     employee_id = fields.Many2one('hr.employee', "Employee")
     submit_id = fields.Many2one('hr.timesheet.submit',string='Submission Duration')

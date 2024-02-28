@@ -30,7 +30,7 @@ class HrTimesheetSubmitReport(models.TransientModel):
             submit_ids = []
             submit_ids = self.env['hr.timesheet.submit'].search([]).filtered(lambda a: a.from_date >= self.from_date and a.to_date <= self.to_date).ids
             submit_ids.append(self.env['hr.timesheet.submit'].search([('from_date','<=',self.from_date),('to_date','>=',self.from_date)],limit=1).id)
-            submit_ids.append(self.env['hr.timesheet.submit'].search([('from_date','<=',self.to_date),('to_date','>=',self.to_date)],limit=1).id)
+            submit_ids.append(self.env['hr.timesheet.submit'].search([('to_date','=',self.to_date)],limit=1).id)
             if submit_ids:
                 submit_line_ids = self.env['hr.timesheet.submit.line'].search([('submit_id','in',submit_ids),('submit_status','=',self.submit_status)])
                 self.line_ids = submit_line_ids.ids

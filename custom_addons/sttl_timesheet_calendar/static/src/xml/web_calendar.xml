@@ -105,7 +105,7 @@
 
     <t t-name="CalendarView.navigation_buttons">
         <button class="o_calendar_button_prev btn btn-primary" aria-label="Previous" title="Previous"><span class="fa fa-arrow-left"/></button>
-        <button class="o_calendar_button_today btn btn-primary">Month</button>
+        <button class="o_calendar_button_today btn btn-primary">View Current Month</button>
         <button class="o_calendar_button_next btn btn-primary" aria-label="Next" title="Next"><span class="fa fa-arrow-right"/></button>
     </t>
 

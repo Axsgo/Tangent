@@ -173,7 +173,8 @@
 	                <field name="message" invisible="1"/>
 	            </xpath>
 	            <xpath expr="//field[@name='name']" position="after">
-					<field name="dr_certificate" />
+	            	<field name="type_code" invisible="1"/>
+					<field name="dr_certificate" attrs="{'invisible': [('type_code', '!=', 'SL')]}"/>
 				</xpath>
 	        </field>
 	    </record>
