@@ -118,12 +118,21 @@ class HrLeave(models.Model):
 	
 	def write(self, vals):
 		res = super(HrLeave, self).write(vals)
-		if self.holiday_status_id.code == 'SL' and not self.dr_certificate:
-			days = self.request_date_to - self.request_date_from
-			if days.days > 0 or self.request_date_from.strftime('%A') in ('Monday','Friday') or self.request_date_to.strftime('%A') in ('Monday','Friday'):
-				raise UserError(_("Kindly attach the Medical Certificate, then submit the leave request."))
+		if vals.get('request_date_from') or vals.get('request_date_to'):
+			if self.holiday_status_id.code == 'SL' and not self.dr_certificate:
+				days = self.request_date_to - self.request_date_from
+				if days.days > 0 or self.request_date_from.strftime('%A') in ('Monday','Friday') or self.request_date_to.strftime('%A') in ('Monday','Friday'):
+					raise UserError(_("Kindly attach the Medical Certificate, then submit the leave request."))
 		return res
 	
+	def view_calendar(self):
+		return {
+                'name': _('All Time Off'),
+                'view_mode': 'calendar',
+                'res_model': 'hr.leave',
+                'view_id': self.env.ref('hr_holidays.hr_leave_view_calendar').id,
+                'type': 'ir.actions.act_window',
+            }
 	
 class HrLeaveType(models.Model):
 	_inherit = "hr.leave.type"
