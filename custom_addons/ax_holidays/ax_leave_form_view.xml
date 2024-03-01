@@ -262,5 +262,17 @@
 	        <field name="lang">${object.employee_id.user_id.lang}</field>
 	        <field name="auto_delete" eval="True"/>
 	    </record>
+	    
+	    <record id="ax_absent_update_scheduler" model="ir.cron">
+	        <field name="name">Employee Absent Update Scheduler</field>
+	        <field name="model_id" ref="model_ax_leave"/>
+	        <field name="state">code</field>
+	        <field name="code">model._employee_is_leave_applied_update()</field>
+	        <field name="interval_number">1</field>
+	        <field name="interval_type">days</field>
+	        <field name="numbercall">-1</field>
+	        <field name="active">True</field>
+	        <field name="doall" eval="False"/>
+	    </record>
 	</data>
 </openerp>

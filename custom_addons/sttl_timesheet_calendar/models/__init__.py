@@ -7,3 +7,4 @@ from . import project_project
 from . import hr_timesheet_submit_report
 from . import hr_employee
 from . import project_profit_report
+from . import res_users

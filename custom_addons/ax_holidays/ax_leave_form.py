@@ -75,6 +75,14 @@ class AxLeave(models.Model):
 					template = self.env['ir.model.data'].get_object('ax_holidays','email_template_absent_alert')
 					self.env['mail.template'].browse(template.id).with_context(context).send_mail(leave.id,force_send=True)
 	
+	def _employee_is_leave_applied_update(self):
+		absent_ids = self.env['ax.leave'].search([('state','=','confirm'),('is_leave_applied','=',False)])
+		for leave in absent_ids:
+			leave_id = self.env['hr.leave'].search([('employee_id','=',leave.employee_id.id),('request_date_from','=',leave.from_date)])
+			if leave_id:
+				leave.is_leave_applied = True
+				
+	
 class CalendarLeaves(models.Model):
 	_inherit = "resource.calendar.leaves"
 	

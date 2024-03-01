@@ -43,7 +43,7 @@ class HrTimesheetSubmit(models.Model):
         return res
         
     def lock(self):
-        for rec in self.line_ids.filtered(lambda a: a.state=='unlock'):
+        for rec in self.line_ids.filtered(lambda a: a.state=='unlock' and a.employee_id.not_required==False):
             leave_days = rec.get_unusual_days(self.from_date,self.to_date)
             day_count = list(leave_days.values()).count(False)
             if rec.total_hrs < (day_count*9):
@@ -87,10 +87,11 @@ class HrTimesheetSubmitLine(models.Model):
                 rec.total_hrs = 0
         
     def lock(self):
-        leave_days = self.get_unusual_days(self.submit_id.from_date,self.submit_id.to_date)
-        day_count = list(leave_days.values()).count(False)
-        if self.total_hrs < (day_count*9):
-            raise UserError(_("%s worked hours less-then %s, So you can't submit timesheets.")% (self.employee_id.name,str(day_count*9)))
+        if not self.employee_id.not_required:
+            leave_days = self.get_unusual_days(self.submit_id.from_date,self.submit_id.to_date)
+            day_count = list(leave_days.values()).count(False)
+            if self.total_hrs < (day_count*9):
+                raise UserError(_("%s worked hours less-then %s, So you can't submit timesheets.")% (self.employee_id.name,str(day_count*9)))
         self.state='lock'
         
     def unlock(self):
@@ -153,10 +154,11 @@ class HrTimesheetSubmitWizard(models.TransientModel):
         submit_id = self.env['hr.timesheet.submit.line'].search([('employee_id','=',self.employee_id.id),('submit_id','=',self.submit_id.id),('submit_status','=','not_submit')])
         if not submit_id:
             raise UserError(_("You are already submitted this week timesheets."))
-        leave_days = self.get_unusual_days(self.submit_id.from_date,self.submit_id.to_date)
-        day_count = list(leave_days.values()).count(False)
-        if self.total_hrs < (day_count*9):
-            raise UserError(_("Your worked hours less-then %s in this week, So you can't submit timesheets.")% (day_count*9))
+        if not self.employee_id.not_required:
+            leave_days = self.get_unusual_days(self.submit_id.from_date,self.submit_id.to_date)
+            day_count = list(leave_days.values()).count(False)
+            if self.total_hrs < (day_count*9):
+                raise UserError(_("Your worked hours less-then %s in this week, So you can't submit timesheets.")% (day_count*9))
         submit_id.state='lock'
         submit_id.submit_status='submit'
         

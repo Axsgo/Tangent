@@ -13,7 +13,53 @@
             <field name="numbercall">-1</field>
             <field name="active">True</field>
             <field name="doall" eval="False"/>
-            
         </record>
+        
+        <record id="project_profit_managers_scheduler" model="ir.cron">
+            <field name="name">Project Profit Managers Scheduler</field>
+            <field name="model_id" ref="base.model_res_users"/>
+            <field name="state">code</field>
+            <field name="code">model._project_profit_manager_scheduler()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">weeks</field>
+            <field name="numbercall">-1</field>
+            <field name="active">False</field>
+            <field name="doall" eval="False"/>
+         </record>  
+         
+         <record id="project_profit_admin_scheduler" model="ir.cron">
+            <field name="name">Project Profit Admin Scheduler</field>
+            <field name="model_id" ref="base.model_res_users"/>
+            <field name="state">code</field>
+            <field name="code">model._project_profit_admin_scheduler()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">weeks</field>
+            <field name="numbercall">-1</field>
+            <field name="active">False</field>
+            <field name="doall" eval="False"/>
+         </record>  
+         
+         <record id="email_template_project_profit" model="mail.template">
+	        <field name="name">Project Profit Alert</field>
+	        <field name="model_id" ref="base.model_res_users"/>
+	        <field name="email_from">${ctx['email_from'] |safe}</field>
+	        <field name="email_to">${ctx['email_to'] |safe}</field>
+	        <field name="subject">Project Profit Report</field>
+	        <field name="body_html" type="html">
+	            <div style="margin: 0px; padding: 0px;">
+	                <p style="margin: 0px; padding: 0px; font-size: 13px;">
+	                    Dear ${object.name},
+	                    <br></br>
+	                    <br></br>
+	                    Please find the Project profit weekly report attachment for your reference.
+	                    <br/><br/>
+	                    Please note: This is an automated message, and there is no need to reply to this email.
+	                </p>
+	            </div>
+	        </field>
+	        <field name="lang">${object.lang}</field>
+	        <field name="auto_delete" eval="False"/>
+	    </record>
+          
 	</data>
 </odoo>
