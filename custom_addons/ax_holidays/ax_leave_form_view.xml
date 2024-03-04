@@ -9,8 +9,9 @@
             <field name="arch" type="xml">
 				<form string="Employee Leave">
 					<header>
-						<button name="entry_confirm" type="object" string="Apply" class="oe_highlight" states="draft" groups="ax_groups.admin_user_group"/> 
-						<field name="state" widget="statusbar"/>
+						<button name="entry_confirm" type="object" string="Apply" class="oe_highlight" states="draft" groups="ax_groups.admin_user_group"/>
+						<button name="set_draft" type="object" string="Set to Draft" class="oe_highlight" states="confirm,cancel" groups="ax_groups.admin_user_group"/> 
+						<field name="state" widget="statusbar" statusbar_visible='draft,confirm'/>
 					</header>
 					<sheet>
 						<div class="oe_title">
@@ -72,7 +73,7 @@
 	        <field name="name">Absent</field>
 	        <field name="model">ax.leave</field>
 	        <field name="arch" type="xml">
-	            <calendar date_start="from_date" date_stop="to_date" color="employee_id" string="Description" date_delay="number_of_days" mode="month" event_limit="5" event_open_popup="true" form_view_id="%(ax_holidays.ax_leave_form_view)d" quick_add="False" show_unusual_days="True" delete="false">
+	            <calendar date_start="from_date" date_stop="to_date" color="employee_id" string="Description" date_delay="number_of_days" mode="month" event_limit="5" event_open_popup="true" form_view_id="%(ax_holidays.ax_leave_form_view)d" quick_add="False" show_unusual_days="True">
 	            	<field name="employee_id"/>
 	            	<!--<field name="holiday_status_id" filters="1"/>-->
 	            	<field name="number_of_days"/>

@@ -43,6 +43,9 @@ class AxLeave(models.Model):
 			self.write({
 				'state':'confirm'
 			})
+			
+	def set_draft(self):
+		self.write({'state':'draft'})
 
 	@api.model
 	def get_unusual_days(self, from_date, to_date=None):
