@@ -20,17 +20,19 @@
 	                        </h2>
 	                    </div> 
 	                    <group>
+                    		<!--<field name="holiday_status_id" attrs="{'readonly':[('state','!=','draft')]}" options="{'no_open':True,'no_create':True}" domain="['&amp;', ('virtual_remaining_leaves', '&gt;', 0), '|', ('allocation_type', 'in', ['fixed_allocation', 'no']),'&amp;',('allocation_type', '=', 'fixed'), ('max_leaves', '&gt;', '0')]" context="{'employee_id':employee_id}"/>-->
+                    		<label for="from_date" string="Dates"/>
+                    		<div class="o_row o_row_readonly o_hr_holidays_dates">
+                    			<span class="oe_inline">First day of leave</span>
+                    			<field name="from_date" required='1' widget="daterange" no_label='1' class="oe_inline" options="{'related_end_date': 'to_date'}" attrs="{'readonly':[('state','!=','draft')]}"/>
+                    			<span class="oe_inline" attrs="{'invisible':[('request_unit_half','=',True)]}">Last day of leave</span>
+                    			<field name="to_date" widget="daterange" no_label='1' class="oe_inline" options="{'related_start_date': 'from_date'}" attrs="{'readonly':[('state','!=','draft')],'invisible': [('request_unit_half', '=', True)]}"/>
+                    			<field name="request_date_from_period" class="oe_inline" string="In"
+                                options="{'horizontal': True}" attrs="{'required': [('request_unit_half', '=', True)], 'invisible': [('request_unit_half', '=', False)],'readonly':[('state','!=','draft')]}"/>
+                    		</div>
+                    	</group>
+	                    <group>
 	                    	<group>
-	                    		<!--<field name="holiday_status_id" attrs="{'readonly':[('state','!=','draft')]}" options="{'no_open':True,'no_create':True}" domain="['&amp;', ('virtual_remaining_leaves', '&gt;', 0), '|', ('allocation_type', 'in', ['fixed_allocation', 'no']),'&amp;',('allocation_type', '=', 'fixed'), ('max_leaves', '&gt;', '0')]" context="{'employee_id':employee_id}"/>-->
-	                    		<label for="from_date" string="Dates"/>
-	                    		<div class="o_row o_row_readonly o_hr_holidays_dates">
-	                    			<span class="oe_inline">From</span>
-	                    			<field name="from_date" required='1' widget="daterange" no_label='1' class="oe_inline" options="{'related_end_date': 'to_date'}" attrs="{'readonly':[('state','!=','draft')]}"/>
-	                    			<span class="oe_inline" attrs="{'invisible':[('request_unit_half','=',True)]}">To</span>
-	                    			<field name="to_date" widget="daterange" no_label='1' class="oe_inline" options="{'related_start_date': 'from_date'}" attrs="{'readonly':[('state','!=','draft')],'invisible': [('request_unit_half', '=', True)]}"/>
-	                    			<field name="request_date_from_period" class="oe_inline" string="In"
-                                    options="{'horizontal': True}" attrs="{'required': [('request_unit_half', '=', True)], 'invisible': [('request_unit_half', '=', False)],'readonly':[('state','!=','draft')]}"/>
-	                    		</div>
 	                    		<field name="request_unit_half" attrs="{'readonly':[('state','!=','draft')]}"/>
 	                    		<!--<field name="number_of_days" widget="timesheet_uom"/>-->
 	                    		<field name="description" widget="text" attrs="{'readonly':[('state','!=','draft')]}"/>
@@ -73,10 +75,10 @@
 	        <field name="name">Absent</field>
 	        <field name="model">ax.leave</field>
 	        <field name="arch" type="xml">
-	            <calendar date_start="from_date" date_stop="to_date" color="employee_id" string="Description" date_delay="number_of_days" mode="month" event_limit="5" event_open_popup="true" form_view_id="%(ax_holidays.ax_leave_form_view)d" quick_add="False" show_unusual_days="True">
+	            <calendar date_start="date_from" date_stop="date_to" color="employee_id" string="Description" date_delay="number_of_days" mode="month" event_limit="5" event_open_popup="true" form_view_id="%(ax_holidays.ax_leave_form_view)d" quick_add="False" show_unusual_days="True" hide_time="True">
 	            	<field name="employee_id"/>
 	            	<!--<field name="holiday_status_id" filters="1"/>-->
-	            	<field name="number_of_days"/>
+	            	<!--<field name="number_of_days"/>-->
 	                <field name="from_date"/>
 	                <field name="to_date"/>
 	                <field name="description"/>

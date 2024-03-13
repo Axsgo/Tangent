@@ -2,8 +2,14 @@ from odoo import api,fields,models,_
 from datetime import date,datetime,time,timedelta
 from pytz import UTC
 from dateutil.rrule import rrule, DAILY
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 from dateutil import parser
+import math
+from collections import namedtuple
+from odoo.addons.resource.models.resource import float_to_time
+from pytz import timezone
+
+DummyAttendance = namedtuple('DummyAttendance', 'hour_from, hour_to, dayofweek, day_period, week_type')
 
 
 class AxLeave(models.Model):
@@ -12,8 +18,11 @@ class AxLeave(models.Model):
 	_order = "id desc"
 	_inherit = ['mail.thread', 'mail.activity.mixin']
 
-	from_date = fields.Date("From Date",default=fields.Date.today,tracking=True)
-	to_date = fields.Date("To Date",default=fields.Date.today,tracking=True)
+	
+	from_date = fields.Date("First day of leave",default=fields.Date.today,tracking=True)
+	to_date = fields.Date("Last day of leave",default=fields.Date.today,tracking=True)
+	date_from = fields.Datetime('Start Date', readonly=False)
+	date_to = fields.Datetime('End Date', readonly=False)
 	request_date_from_period = fields.Selection([('am','Morning'),('pm','Afternoon')],default="am",string="Period")
 	request_unit_half = fields.Boolean("Half Day",copy=False)
 	employee_id = fields.Many2one("hr.employee",'Employee',tracking=True,required=True)
@@ -37,13 +46,77 @@ class AxLeave(models.Model):
 				if rec.from_date and rec.to_date:
 					day_diff = ((rec.to_date-rec.from_date).days)+1
 					rec.number_of_days = day_diff
-
+				
 	def entry_confirm(self):
-		if self.state == 'draft':
-			self.write({
-				'state':'confirm'
-			})
+		self.write({'state':'confirm'})
+		if self.from_date and self.to_date and self.from_date > self.to_date:
+			self.to_date = self.from_date
+		if not self.from_date:
+			self.date_from = False
+		elif not self.request_unit_half and not self.to_date:
+			self.date_to = False
+		else:
+			if self.request_unit_half:
+				self.to_date = self.from_date
+			resource_calendar_id = self.employee_id.resource_calendar_id or self.env.company.resource_calendar_id
+			domain = [('calendar_id', '=', resource_calendar_id.id), ('display_type', '=', False)]
+			attendances = self.env['resource.calendar.attendance'].read_group(domain, ['ids:array_agg(id)', 'hour_from:min(hour_from)', 'hour_to:max(hour_to)', 'week_type', 'dayofweek', 'day_period'], ['week_type', 'dayofweek', 'day_period'], lazy=False)
+			# Must be sorted by dayofweek ASC and day_period DESC
+			attendances = sorted([DummyAttendance(group['hour_from'], group['hour_to'], group['dayofweek'], group['day_period'], group['week_type']) for group in attendances], key=lambda att: (att.dayofweek, att.day_period != 'morning'))
+			default_value = DummyAttendance(0, 0, 0, 'morning', False)
+		
+			if resource_calendar_id.two_weeks_calendar:
+				# find week type of start_date
+				start_week_type = int(math.floor((self.from_date.toordinal() - 1) / 7) % 2)
+				attendance_actual_week = [att for att in attendances if att.week_type is False or int(att.week_type) == start_week_type]
+				attendance_actual_next_week = [att for att in attendances if att.week_type is False or int(att.week_type) != start_week_type]
+				# First, add days of actual week coming after date_from
+				attendance_filtred = [att for att in attendance_actual_week if int(att.dayofweek) >= self.from_date.weekday()]
+				# Second, add days of the other type of week
+				attendance_filtred += list(attendance_actual_next_week)
+				# Third, add days of actual week (to consider days that we have remove first because they coming before date_from)
+				attendance_filtred += list(attendance_actual_week)
+		
+				end_week_type = int(math.floor((self.to_date.toordinal() - 1) / 7) % 2)
+				attendance_actual_week = [att for att in attendances if att.week_type is False or int(att.week_type) == end_week_type]
+				attendance_actual_next_week = [att for att in attendances if att.week_type is False or int(att.week_type) != end_week_type]
+				attendance_filtred_reversed = list(reversed([att for att in attendance_actual_week if int(att.dayofweek) <= self.to_date.weekday()]))
+				attendance_filtred_reversed += list(reversed(attendance_actual_next_week))
+				attendance_filtred_reversed += list(reversed(attendance_actual_week))
+		
+				# find first attendance coming after first_day
+				attendance_from = attendance_filtred[0]
+				# find last attendance coming before last_day
+				attendance_to = attendance_filtred_reversed[0]
+			else:
+				# find first attendance coming after first_day
+				attendance_from = next((att for att in attendances if int(att.dayofweek) >= self.from_date.weekday()), attendances[0] if attendances else default_value)
+				# find last attendance coming before last_day
+				attendance_to = next((att for att in reversed(attendances) if int(att.dayofweek) <= self.to_date.weekday()), attendances[-1] if attendances else default_value)
+				
+			compensated_from_date = self.from_date
+			compensated_to_date = self.to_date
 			
+			if self.request_unit_half:
+				if self.request_date_from_period == 'am':
+					hour_from = float_to_time(attendance_from.hour_from)
+					hour_to = float_to_time(attendance_from.hour_to)
+				else:
+					hour_from = float_to_time(attendance_to.hour_from)
+					hour_to = float_to_time(attendance_to.hour_to)
+			else:
+				hour_from = float_to_time(attendance_from.hour_from)
+				hour_to = float_to_time(attendance_to.hour_to)
+			self.date_from = timezone(self.employee_id.resource_calendar_id.tz).localize(datetime.combine(compensated_from_date, hour_from)).astimezone(UTC).replace(tzinfo=None)
+			self.date_to = timezone(self.employee_id.resource_calendar_id.tz).localize(datetime.combine(compensated_to_date, hour_to)).astimezone(UTC).replace(tzinfo=None)
+			
+	@api.constrains('from_date', 'to_date', 'employee_id')
+	def _check_date(self):
+			nholidays = self.search_count([('from_date', '<=', self.from_date),('to_date', '>=', self.to_date),
+			    			('employee_id', '=', self.employee_id.id),('id', '!=', self.id)])
+			if nholidays:
+				raise ValidationError(_('You can not set 2 time off that overlaps on the same day for the same employee.'))
+
 	def set_draft(self):
 		self.write({'state':'draft'})
 
