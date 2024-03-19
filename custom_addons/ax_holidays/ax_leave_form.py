@@ -198,7 +198,16 @@ class HrLeave(models.Model):
 			days = parser.parse(vals.get('request_date_to')).date() - parser.parse(vals.get('request_date_from')).date()
 			if days.days > 0 or parser.parse(vals.get('request_date_from')).strftime('%A') in ('Monday','Friday') or parser.parse(vals.get('request_date_to')).strftime('%A') in ('Monday','Friday'):
 				raise UserError(_("Kindly attach the Medical Certificate, then submit the leave request."))
-		return super(HrLeave, self).create(vals)
+		rec = super(HrLeave, self).create(vals)
+		if vals.get('state')=='confirm':
+			context = {
+				'email_to':rec.employee_id.parent_id.work_email,
+				'email_from':rec.env.company.erp_email,
+				'subject': "System Notification: Request to approve Leave",
+				}
+			template = self.env['ir.model.data'].get_object('ax_holidays','email_template_approve_alert')
+			self.env['mail.template'].browse(template.id).with_context(context).send_mail(rec.id,force_send=True)
+		return rec
 	
 	def write(self, vals):
 		res = super(HrLeave, self).write(vals)
@@ -207,7 +216,26 @@ class HrLeave(models.Model):
 				days = self.request_date_to - self.request_date_from
 				if days.days > 0 or self.request_date_from.strftime('%A') in ('Monday','Friday') or self.request_date_to.strftime('%A') in ('Monday','Friday'):
 					raise UserError(_("Kindly attach the Medical Certificate, then submit the leave request."))
+		if vals.get('state')=='confirm':
+			context = {
+				'email_to':self.employee_id.parent_id.work_email,
+				'email_from':self.env.company.erp_email,
+				'subject': "System Notification: Request to approve Leave",
+				}
+			template = self.env['ir.model.data'].get_object('ax_holidays','email_template_approve_alert')
+			self.env['mail.template'].browse(template.id).with_context(context).send_mail(self.id,force_send=True)
 		return res
+	
+	def remainder_notification(self):
+		if self.state == 'confirm':
+			context = {
+				'email_to':self.employee_id.parent_id.work_email,
+				'email_from':self.env.company.erp_email,
+				'subject': "System Notification: Request to approve Leave",
+				}
+			template = self.env['ir.model.data'].get_object('ax_holidays','email_template_approve_alert')
+			self.env['mail.template'].browse(template.id).with_context(context).send_mail(self.id,force_send=True)
+		
 	
 	def view_calendar(self):
 		return {

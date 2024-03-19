@@ -105,6 +105,8 @@ class AccountAnalyticLine(models.Model):
                 raise UserError(_("You can not create/update timesheet for this date"))
             if res.unit_amount <= 0:
                 raise UserError(_("You can not update zero duration timesheet"))
+            # if res.start <= 13 < res.end or res.start < 14 <= res.end:
+            #     raise UserError(_("Between lunch time (1 PM to 2 PM), timesheets cannot be created."))
             # if res.to_date < res.from_date:
             #     raise UserError(_("End Time should be greater than Start Time."))
             res.project_id.stage_id = res.status_id.id
@@ -118,6 +120,8 @@ class AccountAnalyticLine(models.Model):
             raise UserError(_("You can not create/update timesheet for this date"))
         if self.unit_amount <= 0:
             raise UserError(_("You can not update zero duration timesheet"))
+        # if self.start <= 13 < self.end or self.start < 14 <= self.end:
+        #     raise UserError(_("Between lunch time (1 PM to 2 PM), timesheets cannot be created."))
         # if self.to_date < self.from_date:
         #     raise UserError(_("End Time should be greater than Start Time."))
         # if self.date != self.from_date.date() or self.date != self.to_date.date():

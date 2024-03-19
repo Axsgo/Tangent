@@ -9,6 +9,7 @@ class HREmployee(models.Model):
 	_inherit = "hr.employee"
 	
 	not_required = fields.Boolean('Timesheet Not Required')
+	date_of_join = fields.Date("Date of Joining", required=True)
 	
 	@api.model
 	def create(self, vals):
@@ -38,7 +39,8 @@ class HREmployee(models.Model):
 		sterday = datetime.now().date() - relativedelta(days=1)
 		for emp in employee_ids:
 			leave_day = emp.get_unusual_days_emp(emp.resource_calendar_id,sterday,sterday)
-			if leave_day[sterday.strftime("%Y-%m-%d")] == False:
+			leave_id = self.env['hr.leave'].search([('request_date_from','<=',sterday),('request_date_to','>=',sterday),('employee_id','=',emp.id),('state','=','validate')])
+			if leave_day[sterday.strftime("%Y-%m-%d")] == False and not leave_id:
 				timesheet_ids = self.env['account.analytic.line'].search([('date','>=',sterday),('date','<=',sterday),
 					('employee_id','=',emp.id)])
 				if timesheet_ids:
@@ -82,7 +84,8 @@ class HREmployee(models.Model):
 							for x in range(date_difference + 1):
 								current_date = from_date + relativedelta(days=x)
 								leave_day = emp.get_unusual_days_emp(emp.resource_calendar_id,current_date,current_date)
-								if leave_day[current_date.strftime("%Y-%m-%d")] == False:
+								leave_id = self.env['hr.leave'].search([('request_date_from','<=',current_date),('request_date_to','>=',current_date),('employee_id','=',emp.id),('state','=','validate')])
+								if leave_day[current_date.strftime("%Y-%m-%d")] == False and not leave_id:
 									timesheet_ids = self.env['account.analytic.line'].search([('date','>=',current_date),('date','<=',current_date),
 										('employee_id','=',emp.id)])
 									if emp not in emp_ids:
@@ -133,4 +136,5 @@ class HREmployeePublic(models.Model):
 	_inherit = "hr.employee.public"
 	
 	not_required = fields.Boolean('Timesheet Not Required')
+	date_of_join = fields.Date("Date of Joining")
 	

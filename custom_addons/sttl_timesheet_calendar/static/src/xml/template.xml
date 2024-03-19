@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-inherit="mail.MessagingMenu" t-inherit-mode="extension" owl="1">
+        <xpath expr="//a[hasclass('o_MessagingMenu_toggler')]" position="replace">
+        </xpath>
+	</t>
+	<t t-inherit="mail.systray.ActivityMenu" t-inherit-mode="extension" owl="1">
+        <xpath expr="//li[hasclass('o_mail_systray_item')]" position="replace">
+        </xpath>
+	</t>
+</templates>

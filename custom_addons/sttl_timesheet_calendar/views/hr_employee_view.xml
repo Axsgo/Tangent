@@ -9,6 +9,9 @@
 			<xpath expr="//field[@name='coach_id']" position="after">
 				<field name="not_required" />
 			</xpath>
+			<xpath expr="//field[@name='work_location']" position="after">
+				<field name="date_of_join" />
+			</xpath>
         </field>
     </record>
     

@@ -26,7 +26,8 @@
         'views/hr_employee_view.xml',
     ],
     'qweb': [
-        "static/src/xml/web_calendar.xml",
+        'static/src/xml/web_calendar.xml',
+        'static/src/xml/template.xml'
     ],
     'installable': True,
     'application': True,

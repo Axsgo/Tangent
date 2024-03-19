@@ -193,6 +193,9 @@
 	            	<field name="type_code" invisible="1"/>
 					<field name="dr_certificate" attrs="{'invisible': [('type_code', '!=', 'SL')]}"/>
 				</xpath>
+				<xpath expr="//button[@name='action_draft']" position="after">
+					<button name="remainder_notification" type="object" string="Remainder Email" class="oe_highlight" states="confirm"/>
+				</xpath>
 	        </field>
 	    </record>
 	    
@@ -276,6 +279,29 @@
 	        <field name="numbercall">-1</field>
 	        <field name="active">True</field>
 	        <field name="doall" eval="False"/>
+	    </record>
+	    
+	    <!-- Leave approve Alerts Mail -->
+	    <record id="email_template_approve_alert" model="mail.template">
+	        <field name="name">Employee Leave Approve Alert</field>
+	        <field name="model_id" ref="model_hr_leave"/>
+	        <field name="email_from">${ctx['email_from'] |safe}</field>
+	        <field name="email_to">${ctx['email_to'] |safe}</field>
+	        <field name="subject">${ctx['subject']}</field>
+	        <field name="body_html" type="html">
+	            <div style="margin: 0px; padding: 0px;">
+	                <p style="margin: 0px; padding: 0px; font-size: 13px;">
+	                    Dear <b>${object.employee_id.parent_id.name}</b>,
+	                    <br></br>
+	                    <br></br>
+	                    <b>${object.employee_id.name}</b> has applied for ${object.holiday_status_id.name}, Kindly verify and approve. 
+	                    <br/><br/>
+	                    Please note: This is an automated message, and there is no need to reply to this email.
+	                </p>
+	            </div>
+	        </field>
+	        <field name="lang">${object.employee_id.user_id.lang}</field>
+	        <field name="auto_delete" eval="True"/>
 	    </record>
 	</data>
 </openerp>
