@@ -3,6 +3,7 @@ import mysql.connector
 from odoo import exceptions
 from odoo.exceptions import ValidationError
 from dateutil.relativedelta import relativedelta
+from datetime import timedelta
 
 
 class ResCompany(models.Model):
@@ -64,10 +65,10 @@ class ResCompany(models.Model):
                 if result_set:
                     lines = []
                     for result in result_set:
-                        lines.append((0,0,{'check_in':result[1],'check_out':result[2]}))
+                        lines.append((0,0,{'check_in':result[1]- timedelta(hours=5.5),'check_out':result[2]- timedelta(hours=5.5)}))
                     first_check_in = min(result_set, key=lambda x: x[1])
                     last_check_out = max(result_set, key=lambda x: x[2])
-                    self.env['hr.attendance'].create({'fetch_date':self.fetch_date,'employee_id':employee.id,'line_ids':lines,'check_in':first_check_in[1],'check_out':last_check_out[2]})
+                    self.env['hr.attendance'].create({'fetch_date':self.fetch_date,'employee_id':employee.id,'line_ids':lines,'check_in':first_check_in[1]- timedelta(hours=5.5),'check_out':last_check_out[2]- timedelta(hours=5.5)})
             self.fetch_date = self.fetch_date + relativedelta(days=1)
             con.close()
             cursor.close()

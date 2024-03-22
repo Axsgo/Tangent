@@ -60,7 +60,7 @@
             <field name="view_mode">tree,form</field>
         </record>
 
-    	<menuitem name="Timesheet submission" id="hr_timesheet_submit" parent="hr_timesheet.timesheet_menu_root" 
+    	<menuitem name="Timesheet submission" id="hr_timesheet_submit" parent="hr_timesheet.menu_hr_time_tracking" 
     		action="action_hr_timesheet_submit" groups="ax_groups.admin_user_group" sequence='11'/>
     		
     	<!--Timesheet submit wizard-->	
