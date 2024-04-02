@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+
+        <!-- Attendance Permission -->
+        <record id="hr_attendance_permission_tree_view" model="ir.ui.view">
+	        <field name="name">Attendance Permission</field>
+	        <field name="model">hr.attendance.permission</field>
+	        <field name="arch" type="xml">
+	            <tree string="Attendance Permission">
+	                <field name="employee_id"/>
+	                <field name="date"/>
+	                <field name="check_in"/>
+	                <field name="check_out"/>
+	                <field name="state"/>
+	            </tree>
+	        </field>
+	    </record>
+
+	    <record id="hr_attendance_permission_form_view" model="ir.ui.view">
+	        <field name="name">Attendance Permission</field>
+	        <field name="model">hr.attendance.permission</field>
+	        <field name="arch" type="xml">
+	            <form string="Attendance Permission">
+					<header>
+						<button name = "entry_approve" type = "object" string = "Approve" states = "applied" 
+							class = "oe_highlight" groups="hr.group_hr_manager"/>
+						<button name = "entry_cancel" type = "object" string = "Cancel" states = "applied"/>
+						<field name="state" widget="statusbar" statusbar_visible='applied,approved,rejected'/>
+					</header>
+	                <sheet>
+	                    <group>
+							<group>
+		                        <field name="employee_id" attrs="{'readonly':[('state','!=','applied')]}"/>
+		                        <field name="date" invisible="1"/>
+		                        <field name="check_in" attrs="{'readonly':[('state','!=','applied')]}"/>
+		                        <field name="check_out" attrs="{'readonly':[('state','!=','applied')]}"/>
+		                        <field name="comments" attrs="{'readonly':[('state','!=','applied')]}"/>
+		               		</group>
+	                    </group>
+	                </sheet>
+	            </form>
+	        </field>
+	    </record>
+
+	    <record id="hr_attendance_permission_view_filter" model="ir.ui.view">
+	        <field name="name">hr_attendance_permission_view_filter</field>
+	        <field name="model">hr.attendance.permission</field>
+	        <field name="arch" type="xml">
+	            <search string="Hr Attendance Permission Search">
+	                <field name="employee_id"/>
+	                <filter string="My Permission" name="mypermission" domain="[('employee_id.user_id.id', '=', uid)]" />
+	                <separator/>
+	                <filter string="Check Out" name="check_in_filter" date="check_in" default_period="last_month"/>
+	                <filter string="No Check In" name="nocheckout" domain="[('check_in', '=', False)]" />
+	                <group expand="0" string="Group By">
+	                    <filter string="Employee" name="employee" context="{'group_by': 'employee_id'}"/>
+	                    <filter string="Check In" name="groupby_name" context="{'group_by': 'check_in'}"/>
+	                    <filter string="Check Out" name="groupby_check_out" context="{'group_by': 'check_out'}"/>
+	                    <filter string="Date" name="groupby_date" context="{'group_by': 'date'}"/>
+	                </group>
+	            </search>
+	        </field>
+	    </record>
+
+	    <record id="hr_attendance_permission_calendar_view" model="ir.ui.view">
+	        <field name="name">Attendance Permission</field>
+	        <field name="model">hr.attendance.permission</field>
+	        <field name="arch" type="xml">
+	            <calendar date_start="check_in" date_stop="check_out" string="Description" mode="month" color="employee_id" event_limit="5" event_open_popup="true" form_view_id="%(ax_attendance.hr_attendance_permission_form_view)d" quick_add="False" show_unusual_days="True" hide_time="True">
+	            	<field name="employee_id" filters="1"/>
+	            	<field name="date"/>
+	            	<field name="check_in"/>
+	            	<field name="check_out"/>
+	            	<field name="state"/>
+	            </calendar>
+	        </field>
+	    </record>
+
+	    <!-- actions -->
+	    <record id="hr_attendance_permission_action" model="ir.actions.act_window">
+	        <field name="name">Attendance Permission</field>
+	        <field name="res_model">hr.attendance.permission</field>
+	        <field name="view_mode">calendar,tree,form</field>
+	        <field name="context">{"search_default_header":1}</field>
+	        <field name="search_view_id" ref="hr_attendance_permission_view_filter" />
+	        <field name="help" type="html">
+	            <p class="o_view_nocontent_empty_folder">
+	                No attendance Permission records found
+	            </p><p>
+	                The attendance Permission records of your employees will be displayed here.
+	            </p>
+	        </field>
+	    </record>
+
+	    <menuitem id="menu_hr_attendance_permission_view_attendances" name="Attendance Log Permission" sequence="11" 
+	    	parent="hr.menu_hr_root" groups="hr.group_hr_user" action="hr_attendance_permission_action"/>
+		
+		<record id="hr_attendance_permission_rule_user" model="ir.rule">
+	        <field name="name">attendance.permission.user</field>
+	        <field name="model_id" ref="ax_attendance.model_hr_attendance_permission" />
+	        <field name="domain_force">[('employee_id.user_id', '=', user.id)]</field>
+	        <field name="groups" eval="[(4, ref('hr.group_hr_user'))]" />
+	    </record>
+	    
+	    <record id="hr_attendance_permission_rule_manager" model="ir.rule">
+	        <field name="name">attendance.permission.manager</field>
+	        <field name="model_id" ref="ax_attendance.model_hr_attendance_permission" />
+	        <field name="domain_force">['|',('employee_id.user_id', '=', user.id),('employee_id.parent_id.user_id', '=', user.id)]</field>
+	        <field name="groups" eval="[(4, ref('hr.group_hr_manager'))]" />
+	    </record>
+	</data>
+</odoo>

@@ -197,7 +197,7 @@
 	        </field>
 	    </record>
 
-	    <menuitem id="menu_hr_attendance_line_view_attendances" name="Attendance Check In/Check Out" parent="hr_attendance.menu_hr_attendance_manage_attendances" sequence="11" groups="hr_attendance.group_hr_attendance_user" action="hr_attendance_line_action"/>
+	    <!--<menuitem id="menu_hr_attendance_line_view_attendances" name="Attendance Check In/Check Out" parent="hr_attendance.menu_hr_attendance_manage_attendances" sequence="11" groups="hr_attendance.group_hr_attendance_user" action="hr_attendance_line_action"/>-->
 	
 		<!-- Employee Daily scheduler -->
 	    <record id="hr_attendance_employee_daily_alert_scheduler" model="ir.cron">
