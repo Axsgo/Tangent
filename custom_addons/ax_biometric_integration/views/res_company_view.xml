@@ -32,5 +32,27 @@
                 </page>
             </field>
         </record>
+        
+        <record id="email_template_manager_missing_count_alert" model="mail.template">
+	        <field name="name">Missing attendance log warning</field>
+	        <field name="model_id" ref="hr_attendance.model_hr_attendance"/>
+	        <field name="email_from">${ctx['email_from'] |safe}</field>
+	        <field name="email_to">${ctx['email_to'] |safe}</field>
+	        <field name="subject">System Notification: Missing attendance log warning</field>
+	        <field name="body_html" type="html">
+	            <div style="margin: 0px; padding: 0px;">
+	                <p style="margin: 0px; padding: 0px; font-size: 13px;">
+	                	Dear <b>${object.parent_id.name}</b>,
+	                    <br/><br/>
+	                    Please Check <b>${object.name}</b> attendance log and take action. 
+	                    He failed to check in or out in the biometric device, or attendance log is containing incorrect information. 
+	                    It has happened more than five times. 
+	                    <br/><br/>
+	                    Please note: This is an automated message, and there is no need to reply to this email.
+	                </p>
+	            </div>
+	        </field>
+	        <field name="auto_delete" eval="True"/>
+	    </record>
     </data>
 </odoo>

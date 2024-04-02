@@ -14,7 +14,7 @@
             	</field>
             	<xpath expr="//group" position="after">
             		<notebook>
-            			<page string="Timesheet">
+            			<page string="Check In/Check Out">
             				<field name="line_ids">
             					<tree editable="bottom">
             						<field name="employee_id"/>
@@ -78,12 +78,12 @@
 	        </field>
 	    </record>
 
-        <!-- Attendance Timesheet -->
+        <!-- Attendance Check In/Check Out -->
         <record id="hr_attendance_line_tree_view" model="ir.ui.view">
-	        <field name="name">Attendance Timesheet</field>
+	        <field name="name">Attendance Check In/Check Out</field>
 	        <field name="model">hr.attendance.line</field>
 	        <field name="arch" type="xml">
-	            <tree string="Attendance Timesheet" sample="1"  create="false">
+	            <tree string="Attendance Check In/Check Out" sample="1"  create="false">
 	                <field name="employee_id" required='1'/>
 	                <field name="check_out"/>
 	                <field name="check_in"/>
@@ -93,10 +93,10 @@
 	    </record>
 
 	    <record id="hr_attendance_line_form_view" model="ir.ui.view">
-	        <field name="name">Attendance Timesheet</field>
+	        <field name="name">Attendance Check In/Check Out</field>
 	        <field name="model">hr.attendance.line</field>
 	        <field name="arch" type="xml">
-	            <form string="Attendance Timesheet" create="false">
+	            <form string="Attendance Check In/Check Out" create="false">
 	                <sheet>
 	                    <group>
 	                        <field name="employee_id"/>
@@ -113,7 +113,7 @@
 	        <field name="name">hr_attendance_line_view_filter</field>
 	        <field name="model">hr.attendance.line</field>
 	        <field name="arch" type="xml">
-	            <search string="Hr Attendance Timesheet Search">
+	            <search string="Hr Attendance Check In/Check Out Search">
 	                <field name="employee_id"/>
 	                <filter string="My Attendances" name="myattendances" domain="[('employee_id.user_id.id', '=', uid)]" />
 	                <separator/>
@@ -133,7 +133,7 @@
 	        <field name="name">hr.attendance.line.pivot</field>
 	        <field name="model">hr.attendance.line</field>
 	        <field name="arch" type="xml">
-	            <pivot string="Attendance Timesheet" sample="1">
+	            <pivot string="Attendance Check In/Check Out" sample="1">
 	                <field name="employee_id" type="row"/>
 	                <field name="check_out" type="col"/>
 	                <field name="worked_hours" type="measure" widget="float_time"/>
@@ -154,7 +154,7 @@
 	    </record>
 
 	    <record id="hr_attendance_line_calendar_view" model="ir.ui.view">
-	        <field name="name">Attendance Timesheet</field>
+	        <field name="name">Attendance Check In/Check Out</field>
 	        <field name="model">hr.attendance.line</field>
 	        <field name="arch" type="xml">
 	            <calendar date_start="check_in" date_stop="check_out" string="Description" date_delay="worked_hours" mode="month" color="employee_id" event_limit="5" event_open_popup="true" form_view_id="%(ax_attendance.hr_attendance_line_form_view)d" quick_add="False" show_unusual_days="True">
@@ -169,34 +169,101 @@
 	    <!-- actions -->
 
 	    <record id="hr_attendance_line_action" model="ir.actions.act_window">
-	        <field name="name">Attendance Timesheet</field>
+	        <field name="name">Attendance Check In/Check Out</field>
 	        <field name="res_model">hr.attendance.line</field>
 	        <field name="view_mode">tree,form,pivot,graph,calendar</field>
 	        <field name="context">{"search_default_header":1}</field>
 	        <field name="search_view_id" ref="hr_attendance_line_view_filter" />
 	        <field name="help" type="html">
 	            <p class="o_view_nocontent_empty_folder">
-	                No attendance timesheet records found
+	                No attendance Check In/Check Out records found
 	            </p><p>
-	                The attendance timesheet records of your employees will be displayed here.
+	                The attendance Check In/Check Out records of your employees will be displayed here.
 	            </p>
 	        </field>
 	    </record>
 
 	    <record id="hr_attendance_action_line_employee" model="ir.actions.act_window">
-	        <field name="name">Attendance Timesheet</field>
+	        <field name="name">Attendance Check In/Check Out</field>
 	        <field name="res_model">hr.attendance.line</field>
 	        <field name="view_mode">tree,form,pivot,graph,calendar</field>
 	        <field name="context">{'create': False}</field>
 	        <field name="help" type="html">
 	            <p class="o_view_nocontent_empty_folder">
-	                No attendance timesheet records to display
+	                No attendance Check In/Check Out records to display
 	            </p><p>
-	                The attendance timesheet records of your employees will be displayed here.
+	                The attendance Check In/Check Out records of your employees will be displayed here.
 	            </p>
 	        </field>
 	    </record>
 
-	    <menuitem id="menu_hr_attendance_line_view_attendances" name="Attendance Timesheet" parent="hr_attendance.menu_hr_attendance_manage_attendances" sequence="11" groups="hr_attendance.group_hr_attendance_user" action="hr_attendance_line_action"/>
+	    <menuitem id="menu_hr_attendance_line_view_attendances" name="Attendance Check In/Check Out" parent="hr_attendance.menu_hr_attendance_manage_attendances" sequence="11" groups="hr_attendance.group_hr_attendance_user" action="hr_attendance_line_action"/>
+	
+		<!-- Employee Daily scheduler -->
+	    <record id="hr_attendance_employee_daily_alert_scheduler" model="ir.cron">
+	        <field name="name">Employee Daily Attendance Alert Scheduler</field>
+	        <field name="model_id" ref="hr_attendance.model_hr_attendance"/>
+	        <field name="state">code</field>
+	        <field name="code">model._employee_alert_daily_attendance()</field>
+	        <field name="interval_number">1</field>
+	        <field name="interval_type">days</field>
+	        <field name="numbercall">-1</field>
+	        <field name="active">True</field>
+	        <field name="doall" eval="False"/>
+	    </record>
+	
+	    <record id="email_template_employee_daily_attendance_alert" model="mail.template">
+	        <field name="name">Employee Attendace Daily Alert</field>
+	        <field name="model_id" ref="hr_attendance.model_hr_attendance"/>
+	        <field name="email_from">${ctx['email_from'] |safe}</field>
+	        <field name="email_to">${ctx['email_to'] |safe}</field>
+	        <field name="subject">System Notification: Daily Attendance Alert</field>
+	        <field name="body_html" type="html">
+	            <div style="margin: 0px; padding: 0px;">
+	                <p style="margin: 0px; padding: 0px; font-size: 13px;">
+	                	Dear <b>${object.employee_id.name}</b>,
+	                    <br/><br/>
+	                    Please find the attendance report for not meet work hours on <b>${ctx['sterday'].strftime("%d/%b/%Y")}</b>.
+	                    <br/><br/>
+	                    Please note: This is an automated message, and there is no need to reply to this email.
+	                </p>
+	            </div>
+	        </field>
+	        <field name="auto_delete" eval="True"/>
+	    </record>
+	    
+	    <!-- Admin Weekly attendance and timesheet difference scheduler -->
+	    <!--<record id="hr_attendance_admin_weekly_attendance_timesheet_alert_scheduler" model="ir.cron">
+	        <field name="name">Admin weekly attendance and timesheet difference alert scheduler</field>
+	        <field name="model_id" ref="hr_attendance.model_hr_attendance"/>
+	        <field name="state">code</field>
+	        <field name="code">model._employee_weekly_alert_timesheet_attendance()</field>
+	        <field name="interval_number">1</field>
+	        <field name="interval_type">weeks</field>
+	        <field name="numbercall">-1</field>
+	        <field name="active">True</field>
+	        <field name="doall" eval="False"/>
+	    </record>
+	
+	    <record id="email_template_admin_weekly_attendance_timesheet_alert" model="mail.template">
+	        <field name="name">Admin weekly attendance and timesheet difference alert</field>
+	        <field name="model_id" ref="hr_attendance.model_hr_attendance"/>
+	        <field name="email_from">${ctx['email_from'] |safe}</field>
+	        <field name="email_to">${ctx['email_to'] |safe}</field>
+	        <field name="subject">System Notification: Weekly attendance and timesheet hours difference Alert</field>
+	        <field name="body_html" type="html">
+	            <div style="margin: 0px; padding: 0px;">
+	                <p style="margin: 0px; padding: 0px; font-size: 13px;">
+	                	Dear <b>${object.display_name}</b>,
+	                    <br/><br/>
+	                    Please find the report below shows the hours difference between attendance and timesheets for employees who do not meet their attendance goals.
+	                    <br/><br/>
+	                    Please note: This is an automated message, and there is no need to reply to this email.
+	                </p>
+	            </div>
+	        </field>
+	        <field name="auto_delete" eval="True"/>
+	    </record>
+-->
 	</data>
 </odoo>

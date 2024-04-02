@@ -65,10 +65,16 @@ class ResCompany(models.Model):
                 if result_set:
                     lines = []
                     for result in result_set:
-                        lines.append((0,0,{'check_in':result[1]- timedelta(hours=5.5),'check_out':result[2]- timedelta(hours=5.5)}))
+                        if result[1].year == 1970 or result[2].year == 1970:
+                            employee.missing_count+=1
+                        else:
+                            lines.append((0,0,{'check_in':result[1]- timedelta(hours=5.5),'check_out':result[2]- timedelta(hours=5.5)}))
                     first_check_in = min(result_set, key=lambda x: x[1])
                     last_check_out = max(result_set, key=lambda x: x[2])
                     self.env['hr.attendance'].create({'fetch_date':self.fetch_date,'employee_id':employee.id,'line_ids':lines,'check_in':first_check_in[1]- timedelta(hours=5.5),'check_out':last_check_out[2]- timedelta(hours=5.5)})
+                if employee.missing_count > 5:
+                    template = self.env.ref('ax_biometric_integration.email_template_manager_missing_count_alert')
+                    template.with_context({'email_to':employee.parent_id.work_email,'email_from':self.erp_email}).send_mail(employee.id, force_send=True)
             self.fetch_date = self.fetch_date + relativedelta(days=1)
             con.close()
             cursor.close()

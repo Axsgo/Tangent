@@ -5,7 +5,6 @@ import calendar
 from odoo.tools import date_utils
 
 
-
 class Employee(models.Model):
 	_inherit = "hr.employee"
 
@@ -52,31 +51,30 @@ class Employee(models.Model):
 			start_date = today - relativedelta(days=6)
 			date_difference = (today - start_date).days + 1
 			emp_ids = self.env['hr.employee'].search([('active','=',True)])
-			if emp_ids:
-				for emp in emp_ids:
-					avg_len = 7
-					attend_ids = self.env['hr.attendance'].search([('employee_id','=',emp.id),('check_in','>=',start_date),
-					('check_out','<',today)])
-					leave_day = emp.get_unusual_days_emp(emp.resource_calendar_id,start_date,today)
-					current_date = start_date
-					for x in range(1,date_difference + 1):
-						if leave_day[current_date.strftime("%Y-%m-%d")] == True:
-							avg_len -= 1
-						current_date = start_date + relativedelta(days=x)
-					if attend_ids:
-						avg_hrs = sum([x.worked_hours for x in attend_ids])/avg_len
-						if avg_hrs < emp.company_id.attend_work_hrs:
-							context = {
-								'email_to':emp.work_email,
-								'email_cc':emp.parent_id.work_email if emp.parent_id else '',
-								'email_from':self.env.company.erp_email,
-								'float_time':self.float_to_time(avg_hrs),
-								'actual_time':self.float_to_time(emp.company_id.attend_work_hrs),
-								'start_date':start_date.strftime("%A, %B %d, %Y"),
-								'end_date':today.strftime("%A, %B %d, %Y")
-							}
-							template = self.env['ir.model.data'].get_object('ax_attendance', 'email_template_weekly_attendance_alert')
-							self.env['mail.template'].browse(template.id).with_context(context).send_mail(emp.id,force_send=True)
+			for emp in emp_ids:
+				avg_len = 7
+				attend_ids = self.env['hr.attendance'].search([('employee_id','=',emp.id),('check_in','>=',start_date),
+				('check_out','<',today)])
+				leave_day = emp.get_unusual_days_emp(emp.resource_calendar_id,start_date,today)
+				current_date = start_date
+				for x in range(1,date_difference + 1):
+					if leave_day[current_date.strftime("%Y-%m-%d")] == True:
+						avg_len -= 1
+					current_date = start_date + relativedelta(days=x)
+				if attend_ids:
+					avg_hrs = sum([x.worked_hours for x in attend_ids])/avg_len
+					if avg_hrs < emp.company_id.attend_work_hrs:
+						context = {
+							'email_to':emp.work_email,
+							'email_cc':emp.parent_id.work_email if emp.parent_id else '',
+							'email_from':self.env.company.erp_email,
+							'float_time':self.float_to_time(avg_hrs),
+							'actual_time':self.float_to_time(emp.company_id.attend_work_hrs),
+							'start_date':start_date.strftime("%A, %B %d, %Y"),
+							'end_date':today.strftime("%A, %B %d, %Y")
+						}
+						template = self.env['ir.model.data'].get_object('ax_attendance', 'email_template_weekly_attendance_alert')
+						self.env['mail.template'].browse(template.id).with_context(context).send_mail(emp.id,force_send=True)
 
 	def _alert_monthly_attendance(self):
 		today = fields.date.today()
@@ -107,6 +105,5 @@ class Employee(models.Model):
 					'email_from':self.env.company.erp_email,
 					'emp_list':emp_list
 				}
-				print(context)
 				template = self.env['ir.model.data'].get_object('ax_attendance', 'email_template_monthly_attendance_alert')
 				self.env['mail.template'].browse(template.id).with_context(context).send_mail(emp.id,force_send=True)
