@@ -26,7 +26,7 @@ class AxLeave(models.Model):
 	request_date_from_period = fields.Selection([('am','Morning'),('pm','Afternoon')],default="am",string="Period")
 	request_unit_half = fields.Boolean("Half Day",copy=False)
 	employee_id = fields.Many2one("hr.employee",'Employee',tracking=True,required=True)
-	holiday_status_id = fields.Many2one("hr.leave.type",'Time Off Type',tracking=True)
+	holiday_status_id = fields.Many2one("hr.leave.type",'Leave Type',required=True,tracking=True)
 	number_of_days = fields.Float("Duration",compute='_get_number_of_days',store=True,tracking=True)
 	name = fields.Char("Description",related='employee_id.name',store=True,tracking=True)
 	description = fields.Char("Reason",tracking=True,required=True)

@@ -103,7 +103,7 @@ class AxAttendance(models.Model):
 			template = self.env.ref('ax_attendance.email_template_employee_daily_attendance_alert')
 			template.write({'attachment_ids': [(6,0,[report_id.id])]})
 			template.with_context(context).send_mail(attendance.id, force_send=True)
-   # report_id.unlink()
+			report_id.unlink()
 
  # def _employee_weekly_alert_timesheet_attendance(self):	
  # 	today = datetime.now().date()

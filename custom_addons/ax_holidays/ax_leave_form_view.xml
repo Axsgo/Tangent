@@ -20,7 +20,7 @@
 	                        </h2>
 	                    </div> 
 	                    <group>
-                    		<!--<field name="holiday_status_id" attrs="{'readonly':[('state','!=','draft')]}" options="{'no_open':True,'no_create':True}" domain="['&amp;', ('virtual_remaining_leaves', '&gt;', 0), '|', ('allocation_type', 'in', ['fixed_allocation', 'no']),'&amp;',('allocation_type', '=', 'fixed'), ('max_leaves', '&gt;', '0')]" context="{'employee_id':employee_id}"/>-->
+                    		<field name="holiday_status_id" attrs="{'readonly':[('state','!=','draft')]}" options="{'no_open':True,'no_create':True}" domain="['&amp;', ('virtual_remaining_leaves', '&gt;', 0), '|', ('allocation_type', 'in', ['fixed_allocation', 'no']),'&amp;',('allocation_type', '=', 'fixed'), ('max_leaves', '&gt;', '0')]" context="{'employee_id':employee_id}"/>
                     		<label for="from_date" string="Dates"/>
                     		<div class="o_row o_row_readonly o_hr_holidays_dates">
                     			<span class="oe_inline">First day of leave</span>
@@ -62,7 +62,7 @@
             <field name="arch" type="xml">
              <tree string="Employee Leave">
 				<field name="employee_id"/>
-				<!--<field name="holiday_status_id"/>-->
+				<field name="holiday_status_id"/>
 				<field name="from_date"/>
 				<field name="to_date"/>
 				<field name="state" widget="badge"/>
@@ -75,9 +75,9 @@
 	        <field name="name">Absent</field>
 	        <field name="model">ax.leave</field>
 	        <field name="arch" type="xml">
-	            <calendar date_start="date_from" date_stop="date_to" color="employee_id" string="Description" date_delay="number_of_days" mode="month" event_limit="5" event_open_popup="true" form_view_id="%(ax_holidays.ax_leave_form_view)d" quick_add="False" show_unusual_days="True" hide_time="True">
+	            <calendar date_start="date_from" date_stop="date_to" color="holiday_status_id" string="Description" date_delay="number_of_days" mode="month" event_limit="5" event_open_popup="true" form_view_id="%(ax_holidays.ax_leave_form_view)d" quick_add="False" show_unusual_days="True" hide_time="True">
 	            	<field name="employee_id"/>
-	            	<!--<field name="holiday_status_id" filters="1"/>-->
+	            	<field name="holiday_status_id" filters="1"/>
 	            	<!--<field name="number_of_days"/>-->
 	                <field name="from_date"/>
 	                <field name="to_date"/>
@@ -95,12 +95,12 @@
 			<field name="arch" type="xml">
 				<search string="Employee Leave">
 					<field name="employee_id" string="Employee"  filter_domain="[('employee_id','ilike',self)]" />
-					<!--<field name="holiday_status_id" string="Time Off Type"  filter_domain="[('holiday_status_id','ilike',self)]" />-->
+					<field name="holiday_status_id" string="Leave Type"  filter_domain="[('holiday_status_id','ilike',self)]" />
 					<filter name="applied" string="Leave Applied" domain="[('is_leave_applied','=',True)]"/>
 					<filter name="not_applied" string="Leave Not Applied" domain="[('is_leave_applied','=',False)]"/>
 					<group expand="0" string="Group By...">
 						<filter name="employee" string="Employee" domain="[]" context="{'group_by':'employee_id'}"/> 
-						<!--<filter name="holiday_status" string="Time Off Type" domain="[]" context="{'group_by':'holiday_status_id'}"/>--> 
+						<filter name="holiday_status_id" string="Leave Type" domain="[]" context="{'group_by':'holiday_status_id'}"/>
 						<filter name="state" string="Status" domain="[]" context="{'group_by':'state'}"/> 
 					</group>
 				</search>

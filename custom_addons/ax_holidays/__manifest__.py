@@ -10,6 +10,7 @@
     'ir.model.access.csv',
     'ax_leave_form_view.xml',
     'ax_employee_view.xml',
+    'ex_leave_report.xml'
     ],
     'depends': ['base','hr','hr_holidays','ax_groups','ax_base','sttl_timesheet_calendar'],
     'installable': True,

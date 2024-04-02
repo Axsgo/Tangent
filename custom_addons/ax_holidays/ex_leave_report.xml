@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="ex_leave_register_wizard_form" model="ir.ui.view">
+            <field name="name">Leave Report</field>
+            <field name="model">ax.leave.register</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Leave Report">
+                    <sheet>
+                      	<group>
+							<group>
+							    <field name="dept_id"/>
+							    <field name="employee_ids" widget="many2many_tags"/>
+							</group>
+							<group>
+							    <field name="start_date"/>
+							    <field name="end_date"/>
+							</group>
+                      	</group>
+                    </sheet>
+                    <footer>
+						<button name="print_report" string="Print Report" type="object" class="btn-primary"/>
+						<button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        
+        <record id="ex_wizard_action_leave_register" model="ir.actions.act_window">
+            <field name="name">Employee Leave Report</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">ax.leave.register</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+        <menuitem parent="hr_holidays.menu_hr_holidays_report" name="Employee Leave Report" sequence="700"
+        	action="ex_wizard_action_leave_register" id="ex_menu_leave_register" groups="ax_groups.admin_user_group"/>
+    </data>
+</odoo>
