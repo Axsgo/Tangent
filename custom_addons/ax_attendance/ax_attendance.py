@@ -96,13 +96,13 @@ class AxAttendance(models.Model):
                 'datas': base64.encodestring(fp.getvalue()),'res_model': 'hr.attendance','res_id': self.id})
 			context = {
     # 'email_to':attendance.employee_id.work_email,
-    			'email_to':'rajeev@tangentlandscape.com',
+    			'email_to':'rajeev@tangentlandscape.com,savitha.dileep@tangentlandscape.com',
 				'email_from':self.env.company.erp_email,
 				'sterday':sterday
 				}
 			template = self.env.ref('ax_attendance.email_template_employee_daily_attendance_alert')
 			template.write({'attachment_ids': [(6,0,[report_id.id])]})
-			template.with_context(context).send_mail(self.id, force_send=True)
+			template.with_context(context).send_mail(attendance.id, force_send=True)
    # report_id.unlink()
 
  # def _employee_weekly_alert_timesheet_attendance(self):	
