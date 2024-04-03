@@ -1,7 +1,21 @@
 <?xml version="1.0"?>
 <odoo>
+	
+	<record id="module_category_admin_super_admin" model="ir.module.category">
+		<field name="name">Admin</field>
+        <field name="description">Helps you manage your admin.</field>
+        <field name="sequence">100</field>
+    </record>
+    
 	<record model="res.groups" id="admin_user_group">
         <field name="name">Admin</field>
+        <field name="category_id" ref="module_category_admin_super_admin"/>
         <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    
+    <record model="res.groups" id="admin_super_group">
+        <field name="name">Super Admin</field>
+        <field name="category_id" ref="module_category_admin_super_admin"/>
+        <field name="implied_ids" eval="[(4, ref('ax_groups.admin_user_group'))]"/>
     </record>
 </odoo>

@@ -77,7 +77,7 @@
 	        <field name="arch" type="xml">
 	            <calendar date_start="date_from" date_stop="date_to" color="holiday_status_id" string="Description" date_delay="number_of_days" mode="month" event_limit="5" event_open_popup="true" form_view_id="%(ax_holidays.ax_leave_form_view)d" quick_add="False" show_unusual_days="True" hide_time="True">
 	            	<field name="employee_id"/>
-	            	<field name="holiday_status_id" filters="1"/>
+	            	<field name="holiday_status_id" filters="1" color="kanban_color"/>
 	            	<!--<field name="number_of_days"/>-->
 	                <field name="from_date"/>
 	                <field name="to_date"/>
@@ -135,7 +135,7 @@
 	        <field name="arch" type="xml">
 	            <calendar string="Leave Request" form_view_id="%(hr_holidays.hr_leave_view_form_dashboard)d" event_open_popup="true" date_start="date_from" date_stop="date_to" mode="month" quick_add="False" show_unusual_days="True" color="holiday_status_id" hide_time="True">
 	                <field name="display_name"/>
-	                <field name="holiday_status_id" invisible="1" filters="1"/>
+	                <field name="holiday_status_id" filters="1" color="kanban_color"/>
 	                <field name="state" invisible="1"/>
 	            </calendar>
 	        </field>
@@ -147,7 +147,7 @@
 	        <field name="arch" type="xml">
 	            <calendar string="Leave Request" event_open_popup="true" date_start="date_from" date_stop="date_to" mode="month" quick_add="False" color="holiday_status_id">
 	                <field name="display_name"/>
-	                <field name="holiday_status_id" invisible="1" filters="1"/>
+	                <field name="holiday_status_id" filters="1" color="kanban_color"/>
 	                <field name="employee_id" invisible="1"/>
 	            </calendar>
 	        </field>
@@ -207,6 +207,7 @@
 	            <xpath expr="//field[@name='allocation_notif_subtype_id']" position="after">
 	                <field name="leave_limit"/>
 	                <field name="future_days"/>
+	                <field name="kanban_color"/>
 	            </xpath>
 	        </field>
 	    </record>

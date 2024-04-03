@@ -251,5 +251,6 @@ class HrLeaveType(models.Model):
 	
 	leave_limit = fields.Integer('Leave warning Limit')
 	future_days = fields.Boolean('Restrict future dates')
+	kanban_color = fields.Integer('Calendar Color')
 	
 	
