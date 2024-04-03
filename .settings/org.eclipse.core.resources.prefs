@@ -1,6 +1,14 @@
 eclipse.preferences.version=1
+encoding//custom_addons/ax_biometric_integration/__init__.py=utf-8
+encoding//custom_addons/ax_biometric_integration/__manifest__.py=utf-8
+encoding//custom_addons/ax_biometric_integration/models/__init__.py=utf-8
+encoding//custom_addons/hide_menu_user/models/res_user.py=utf-8
 encoding//custom_addons/mt_project_estimation/models/project_project.py=utf-8
 encoding//custom_addons/project_dashboard_odoo/models/pj_dashboard.py=utf-8
+encoding//custom_addons/project_task_report_app/models/project_report.py=utf-8
+encoding//custom_addons/project_task_report_app/models/project_task_report.py=utf-8
 encoding//custom_addons/sttl_timesheet_calendar/models/hr_timesheet.py=utf-8
 encoding//custom_addons/sttl_timesheet_calendar/models/hr_timesheet_submit.py=utf-8
+encoding//custom_addons/sttl_timesheet_calendar/models/hr_timesheet_submit_report.py=utf-8
+encoding//custom_addons/sttl_timesheet_calendar/models/project_profit_report.py=utf-8
 encoding//custom_addons/sttl_timesheet_calendar/models/project_project.py=utf-8
