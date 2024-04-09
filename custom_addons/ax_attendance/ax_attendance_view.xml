@@ -199,9 +199,9 @@
 
 	    <!--<menuitem id="menu_hr_attendance_line_view_attendances" name="Attendance Check In/Check Out" parent="hr_attendance.menu_hr_attendance_manage_attendances" sequence="11" groups="hr_attendance.group_hr_attendance_user" action="hr_attendance_line_action"/>-->
 	
-		<!-- Employee Daily scheduler -->
+		<!-- Employee Attendance Daily Average time report -->
 	    <record id="hr_attendance_employee_daily_alert_scheduler" model="ir.cron">
-	        <field name="name">Employee Daily Attendance Alert Scheduler</field>
+	        <field name="name">Employee Attendance Daily Average time report</field>
 	        <field name="model_id" ref="hr_attendance.model_hr_attendance"/>
 	        <field name="state">code</field>
 	        <field name="code">model._employee_alert_daily_attendance()</field>
@@ -213,57 +213,96 @@
 	    </record>
 	
 	    <record id="email_template_employee_daily_attendance_alert" model="mail.template">
-	        <field name="name">Employee Attendace Daily Alert</field>
+	        <field name="name">Employee Attendance Daily Average time report</field>
 	        <field name="model_id" ref="hr_attendance.model_hr_attendance"/>
 	        <field name="email_from">${ctx['email_from'] |safe}</field>
 	        <field name="email_to">${ctx['email_to'] |safe}</field>
-	        <field name="subject">System Notification: Daily Attendance Alert</field>
+	        <field name="subject">System Notification: Attendance Daily Average time report</field>
 	        <field name="body_html" type="html">
 	            <div style="margin: 0px; padding: 0px;">
 	                <p style="margin: 0px; padding: 0px; font-size: 13px;">
 	                	Dear <b>${object.employee_id.name}</b>,
 	                    <br/><br/>
-	                    Please find the attendance report for not meet work hours on <b>${ctx['sterday'].strftime("%d/%b/%Y")}</b>.
-	                    <br/><br/>
-	                    Please note: This is an automated message, and there is no need to reply to this email.
+	                    Kindly note that your daily average time inside office on (<b>${ctx['sterday'].strftime("%d/%b/%Y")}</b>) is less than required hours (<b>${ctx['com_work_hrs']}</b> hrs).<br/>
+	                    Please make sure you manage this lose hours in the coming days so that you maintain a monthly average of <b>${ctx['com_work_hrs']}</b> hrs per day.<br/>
+	                   	For your information we have attached your daily log for the (<b>${ctx['sterday'].strftime("%d/%b/%Y")}</b>)<br/><br/>
+	                    We look forward for your support in this regards,<br/><br/>
+	                    If you need any further information please do not hesitate to contact company HR.
 	                </p>
 	            </div>
 	        </field>
 	        <field name="auto_delete" eval="True"/>
 	    </record>
 	    
-	    <!-- Admin Weekly attendance and timesheet difference scheduler -->
-	    <!--<record id="hr_attendance_admin_weekly_attendance_timesheet_alert_scheduler" model="ir.cron">
-	        <field name="name">Admin weekly attendance and timesheet difference alert scheduler</field>
-	        <field name="model_id" ref="hr_attendance.model_hr_attendance"/>
+	    <!-- Employee Attendance Weekly Average time -->
+	    <record id="hr_attendance_employee_weekly_attendance_timesheet_alert_scheduler" model="ir.cron">
+	        <field name="name">Employee Attendance Weekly Average time</field>
+	        <field name="model_id" ref="hr.model_hr_employee"/>
 	        <field name="state">code</field>
 	        <field name="code">model._employee_weekly_alert_timesheet_attendance()</field>
 	        <field name="interval_number">1</field>
-	        <field name="interval_type">weeks</field>
+	        <field name="interval_type">days</field>
 	        <field name="numbercall">-1</field>
 	        <field name="active">True</field>
 	        <field name="doall" eval="False"/>
 	    </record>
 	
-	    <record id="email_template_admin_weekly_attendance_timesheet_alert" model="mail.template">
-	        <field name="name">Admin weekly attendance and timesheet difference alert</field>
-	        <field name="model_id" ref="hr_attendance.model_hr_attendance"/>
+	    <record id="email_template_employee_weekly_attendance_timesheet_alert" model="mail.template">
+	        <field name="name">Employee Attendance Weekly Average time</field>
+	        <field name="model_id" ref="hr.model_hr_employee"/>
 	        <field name="email_from">${ctx['email_from'] |safe}</field>
 	        <field name="email_to">${ctx['email_to'] |safe}</field>
-	        <field name="subject">System Notification: Weekly attendance and timesheet hours difference Alert</field>
+	        <field name="subject">System Notification: Attendance Weekly Average time</field>
 	        <field name="body_html" type="html">
 	            <div style="margin: 0px; padding: 0px;">
 	                <p style="margin: 0px; padding: 0px; font-size: 13px;">
 	                	Dear <b>${object.display_name}</b>,
 	                    <br/><br/>
-	                    Please find the report below shows the hours difference between attendance and timesheets for employees who do not meet their attendance goals.
-	                    <br/><br/>
-	                    Please note: This is an automated message, and there is no need to reply to this email.
+						Kindly note that your daily average time inside office for the week starting from <b>${ctx['last_week'].strftime("%d/%b/%Y")}</b> to <b>${ctx['today'].strftime("%d/%b/%Y")}</b> is less than required hours (<b>${ctx['com_work_hrs']}</b> hrs).<br/> 
+						Please make sure you manage this lose hours in the coming days so that you maintain a monthly average of <b>${ctx['com_work_hrs']}</b> hrs per day.<br/>
+						Kindly check the daily average report sent by the system to you directly for understanding your daily time attendance.<br/><br/>
+						We look forward for your support in this regards,<br/><br/>
+						If you need any further information please do not hesitate to contact company HR.
 	                </p>
 	            </div>
 	        </field>
 	        <field name="auto_delete" eval="True"/>
 	    </record>
--->
+	    
+	     <!-- Employee Attendance monthly Average time -->
+	    <record id="hr_attendance_employee_monthly_attendance_timesheet_alert_scheduler" model="ir.cron">
+	        <field name="name">Employee Attendance Monthly Average time</field>
+	        <field name="model_id" ref="hr.model_hr_employee"/>
+	        <field name="state">code</field>
+	        <field name="code">model._employee_monthly_alert_timesheet_attendance()</field>
+	        <field name="interval_number">1</field>
+	        <field name="interval_type">months</field>
+	        <field name="numbercall">-1</field>
+	        <field name="active">True</field>
+	        <field name="doall" eval="False"/>
+	    </record>
+	
+	    <record id="email_template_employee_monthly_attendance_timesheet_alert" model="mail.template">
+	        <field name="name">Employee Attendance monthly Average time</field>
+	        <field name="model_id" ref="hr.model_hr_employee"/>
+	        <field name="email_from">${ctx['email_from'] |safe}</field>
+	        <field name="email_to">${ctx['email_to'] |safe}</field>
+	        <field name="subject">System Notification: Attendance Monthly Average time</field>
+	        <field name="body_html" type="html">
+	            <div style="margin: 0px; padding: 0px;">
+	                <p style="margin: 0px; padding: 0px; font-size: 13px;">
+	                	Dear <b>${object.display_name}</b>,
+	                    <br/><br/>
+	                    Kindly note that your daily average time inside office for the month of <b>${ctx['month']}</b> is less than required hours (<b>${ctx['com_work_hrs']}</b> hrs).<br/>
+	                    Please make sure you manage this lose hours in the coming months so that you maintain a monthly average of <b>${ctx['com_work_hrs']}</b> hrs per day.<br/>
+						Kindly check the daily average report sent by the system to you directly for understanding your daily time attendance.<br/><br/>
+						We look forward for your support in this regards,<br/><br/>
+						If you need any further information please do not hesitate to contact company HR.
+	                </p>
+	            </div>
+	        </field>
+	        <field name="auto_delete" eval="True"/>
+	    </record>
+
 	</data>
 </odoo>

@@ -35,9 +35,10 @@
         
         <record id="email_template_manager_missing_count_alert" model="mail.template">
 	        <field name="name">Missing attendance log warning</field>
-	        <field name="model_id" ref="hr_attendance.model_hr_attendance"/>
+	        <field name="model_id" ref="hr.model_hr_employee"/>
 	        <field name="email_from">${ctx['email_from'] |safe}</field>
 	        <field name="email_to">${ctx['email_to'] |safe}</field>
+	        <field name="email_cc">${ctx['email_cc'] |safe}</field>
 	        <field name="subject">System Notification: Missing attendance log warning</field>
 	        <field name="body_html" type="html">
 	            <div style="margin: 0px; padding: 0px;">
