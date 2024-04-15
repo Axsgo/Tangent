@@ -53,7 +53,7 @@ class AxAttendance(models.Model):
 		return f"{hours:02d}:{minutes:02d}"
 	
 	def _employee_alert_daily_attendance(self):	
-		today = datetime.now().date()
+		today = self.env.company.fetch_date
 		sterday = today - relativedelta(days=1)
 		for attendance in self.env['hr.attendance'].search([('fetch_date','=',sterday)]).filtered(lambda a: a.actual_hours < self.env.company.attend_work_hrs):
 			workbook = xlwt.Workbook(encoding="UTF-8")
@@ -111,8 +111,7 @@ class AxAttendance(models.Model):
 			report_id = self.env['ir.attachment'].create({'name': sterday.strftime("%d/%b/%Y")+' - Employee attendance Report.xls','type': 'binary',
                 'datas': base64.encodestring(fp.getvalue()),'res_model': 'hr.attendance','res_id': self.id})
 			context = {
-    # 'email_to':attendance.employee_id.work_email,
-    			'email_to':'rajeev@tangentlandscape.com,savitha.dileep@tangentlandscape.com',
+			    'email_to':attendance.employee_id.work_email,
 				'email_from':self.env.company.erp_email,
 				'sterday':sterday,
 				'com_work_hrs':self.env.company.attend_work_hrs

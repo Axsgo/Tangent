@@ -14,7 +14,7 @@ class ResCompany(models.Model):
     db_port = fields.Integer(string='Port', tracking=True)
     db_username = fields.Char(string='Username', required=True, tracking=True)
     db_password = fields.Char(string='Password', required=True)
-    db_test_query = fields.Text(string='Test Connection Query', required=True, default= 'SELECT * FROM tmp_attendance limit 1;', tracking=True)
+    db_test_query = fields.Text(string='Fetch Query', required=True, default= 'SELECT * FROM tmp_attendance;', tracking=True)
     db_query_result = fields.Text(string='Connection Result', readonly=True)
     fetch_date = fields.Date(string='Fetch Date', required=True, tracking=True)
 
@@ -56,7 +56,7 @@ class ResCompany(models.Model):
                                         auth_plugin='mysql_native_password')
 
             cursor=con.cursor()
-            cursor.execute('SELECT * FROM tmp_attendance;')
+            cursor.execute(self.db_test_query)
             recordss=cursor.fetchall()
             date_recordss = [record for record in recordss if record[0] == self.fetch_date]
             employee_ids = self.env['hr.employee'].search([])
