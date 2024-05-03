@@ -8,6 +8,7 @@
     'category': 'base',
     'data': [
     'company_view.xml',
+    'res_users.xml',
     ],
     'depends': ['base','hr_timesheet'],
     'installable': True,

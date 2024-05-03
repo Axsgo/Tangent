@@ -202,5 +202,4 @@
         <field name="lang">${object.user_id.lang}</field>
         <field name="auto_delete" eval="True"/>
     </record>
-    
 </odoo>

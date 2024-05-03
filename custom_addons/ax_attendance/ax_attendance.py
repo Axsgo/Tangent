@@ -10,6 +10,19 @@ from dateutil.relativedelta import relativedelta
 import calendar
 from odoo.tools import date_utils
 
+class LocationMaster(models.Model):
+	_name = "hr.location.master"
+	_description = "Location Master"
+	_order = "id desc"
+
+	name = fields.Char("Room No.")
+	detect_lunch = fields.Boolean("Detect Lunch Break",
+		help="Detect Lunch Break from break hrs else add default 1hr Lunch break.")
+
+class HrEmployee(models.Model):
+	_inherit = "hr.employee"
+
+	location_id = fields.Many2one("hr.location.master",'Location')
 
 class AxAttendance(models.Model):
 	_inherit = "hr.attendance"
@@ -52,7 +65,7 @@ class AxAttendance(models.Model):
 		minutes = int(round((float_value - hours) * 60))
 		return f"{hours:02d}:{minutes:02d}"
 	
-	def _employee_alert_daily_attendance(self):	
+	def _employee_alert_daily_attendance(self):
 		today = self.env.company.fetch_date
 		sterday = today - relativedelta(days=1)
 		for attendance in self.env['hr.attendance'].search([('fetch_date','=',sterday)]).filtered(lambda a: a.actual_hours < self.env.company.attend_work_hrs):
@@ -74,8 +87,12 @@ class AxAttendance(models.Model):
 			sheet.write(1, 1, (attendance.check_in+timedelta(hours=5.5)).strftime("%d-%m-%Y %H:%M:%S"), format3)
 			sheet.write(1, 2, (attendance.check_out+timedelta(hours=5.5)).strftime("%d-%m-%Y %H:%M:%S"), format3)
 			sheet.write(1, 3, self.float_to_time(attendance.worked_hours), format3)
-			sheet.write(2, 0, 'Less 1 hour for the lunch break', format1)
-			sheet.write(2, 3, self.float_to_time(-1), format3)
+			if attendance.employee_id.location_id.detect_lunch == True:
+				if any(x.check_out.time() > time(13,0) and x.check_out.time() < time(14,0) for x in attendance.line_ids) and any(x.check_in.time() > time(13,0) and x.check_in.time() < time(14,0) for x in attendance.line_ids):
+					pass
+				else:
+					sheet.write(2, 0, 'Less 1 hour for the lunch break', format1)
+					sheet.write(2, 3, self.float_to_time(-1), format3)
 			sheet.write(3, 0, 'Total time excluding break', format1)
 			sheet.write(3, 3, self.float_to_time((attendance.worked_hours-1)), format3)
 			sheet.write(4, 0, 'Breaks', format4)
@@ -120,7 +137,6 @@ class AxAttendance(models.Model):
 			template.write({'attachment_ids': [(6,0,[report_id.id])]})
 			template.with_context(context).send_mail(attendance.id, force_send=True)
 			report_id.unlink()
-
 
 class Employee(models.Model):
 	_inherit = "hr.employee"

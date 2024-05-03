@@ -1,6 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 	<data>
+		<!-- Location Master -->
+	    <record id="hr_location_master_tree_view" model="ir.ui.view">
+	        <field name="name">Location Master</field>
+	        <field name="model">hr.location.master</field>
+	        <field name="arch" type="xml">
+	            <tree string="Location Master">
+	                <field name="name"/>
+	                <field name="detect_lunch"/>
+	            </tree>
+	        </field>
+	    </record>
+
+	    <record id="hr_location_master_form_view" model="ir.ui.view">
+	        <field name="name">Location Master</field>
+	        <field name="model">hr.location.master</field>
+	        <field name="arch" type="xml">
+	            <form string="Location Master">
+	                <sheet>
+	                    <group>
+	                        <group>
+	                            <field name="name" required='1'/>
+	                        </group>
+	                        <group>
+	                            <field name="detect_lunch"/>
+	                        </group>
+	                    </group>
+	                </sheet>
+	            </form>
+	        </field>
+	    </record>
+
+	    <record id="action_hr_location_master" model="ir.actions.act_window">
+	        <field name="name">Location Master</field>
+	        <field name="res_model">hr.location.master</field>
+	        <field name="view_mode">tree,form</field>
+	        <field name="help" type="html">
+	            <p class="o_view_nocontent_empty_folder">
+	                Create Location Master
+	            </p>
+	        </field>
+	    </record>
+
+	    <menuitem id="menu_hr_location_master" name="Location Master" sequence="2" 
+	            parent="hr.menu_hr_root" groups="hr.group_hr_user" action="action_hr_location_master"/>
+
+	    <!-- employee form -->
+	    <record id="hr_employee_location_form_view" model="ir.ui.view">
+            <field name="name">Employee</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_form"/>
+            <field name="arch" type="xml">
+            	<field name="work_email" position="after">
+            		<field name="location_id" required='1'/>
+            	</field>
+            </field>
+        </record>
+
 		<!-- Attendance form -->
 		<record id="hr_attendance_form_view" model="ir.ui.view">
             <field name="name">Attendance</field>
@@ -8,6 +65,7 @@
             <field name="inherit_id" ref="hr_attendance.hr_attendance_view_form"/>
             <field name="arch" type="xml">
             	<field name="check_out" position="after">
+            		<field name="fetch_date" string="Attendance Date" invisible='0'/>
             		<field name="worked_hours" string="Work Hours" widget="float_time"/>
             		<field name="actual_hours" widget="float_time"/>
             		<field name="timesheet_hours" widget="float_time"/>

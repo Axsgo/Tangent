@@ -172,6 +172,7 @@ class HrLeave(models.Model):
 	message = fields.Text('Message')
 	dr_certificate = fields.Binary("Medical Certificate")
 	type_code = fields.Char("Code", related="holiday_status_id.code")
+	leave_manager_id = fields.Many2one("res.users","Leave Manager",related='employee_id.leave_manager_id',store=True)
 	
 	@api.onchange('holiday_status_id')
 	def _onchange_holiday_status_id(self):

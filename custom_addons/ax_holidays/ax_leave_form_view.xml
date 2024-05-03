@@ -192,10 +192,33 @@
 	            <xpath expr="//field[@name='name']" position="after">
 	            	<field name="type_code" invisible="1"/>
 					<field name="dr_certificate" attrs="{'invisible': [('type_code', '!=', 'SL')]}"/>
+					<field name="leave_manager_id" invisible='1'/>
 				</xpath>
 				<xpath expr="//button[@name='action_draft']" position="after">
 					<button name="remainder_notification" type="object" string="Remainder Email" class="oe_highlight" states="confirm"/>
 				</xpath>
+	        </field>
+	    </record>
+
+	    <record id="hr_leave_view_tree_inherit" model="ir.ui.view">
+	        <field name="name">hr.leave.tree.inherit</field>
+	        <field name="model">hr.leave</field>
+	        <field name="inherit_id" ref="hr_holidays.hr_leave_view_tree"/>
+	        <field name="arch" type="xml">
+	        	<field name="employee_id" position="after">
+	        		<field name="leave_manager_id" invisible='1'/>
+	        	</field>
+	        </field>
+	    </record>
+
+	    <record id="hr_leave_view_search_inherit" model="ir.ui.view">
+	        <field name="name">hr.leave.search.inherit</field>
+	        <field name="model">hr.leave</field>
+	        <field name="inherit_id" ref="hr_holidays.view_hr_holidays_filter"/>
+	        <field name="arch" type="xml">
+	        	<xpath expr="//group/filter[@name='group_employee']" position="after">
+	        		<filter name="group_manager" string="Leave Manager" context="{'group_by':'leave_manager_id'}"/>
+	        	</xpath>
 	        </field>
 	    </record>
 	    
