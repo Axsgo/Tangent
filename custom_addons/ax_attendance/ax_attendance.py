@@ -23,6 +23,11 @@ class HrEmployee(models.Model):
 	_inherit = "hr.employee"
 
 	location_id = fields.Many2one("hr.location.master",'Location')
+	
+class HREmployeePublic(models.Model):
+	_inherit = "hr.employee.public"
+	
+	location_id = fields.Many2one("hr.location.master",'Location')
 
 class AxAttendance(models.Model):
 	_inherit = "hr.attendance"
