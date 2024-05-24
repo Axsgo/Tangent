@@ -99,7 +99,13 @@ class AxAttendance(models.Model):
 					sheet.write(2, 0, 'Less 1 hour for the lunch break', format1)
 					sheet.write(2, 3, self.float_to_time(-1), format3)
 			sheet.write(3, 0, 'Total time excluding break', format1)
-			sheet.write(3, 3, self.float_to_time((attendance.worked_hours-1)), format3)
+			if attendance.employee_id.location_id.detect_lunch == True:
+				if any(x.check_out.time() > time(13,0) and x.check_out.time() < time(14,0) for x in attendance.line_ids) and any(x.check_in.time() > time(13,0) and x.check_in.time() < time(14,0) for x in attendance.line_ids):
+					sheet.write(3, 3, self.float_to_time((attendance.worked_hours)), format3)
+				else:
+					sheet.write(3, 3, self.float_to_time((attendance.worked_hours-1)), format3)
+			else:
+				sheet.write(3, 3, self.float_to_time((attendance.worked_hours)), format3)
 			sheet.write(4, 0, 'Breaks', format4)
 			sheet.write(4, 3, 'Counted', format4)
 			sheet.write(4, 4, 'Non-Counted', format4)
@@ -126,7 +132,13 @@ class AxAttendance(models.Model):
 			sheet.write(i, 3, str(count), format3)
 			sheet.write(i+2, 0, 'Net total time inside the office ('+str(self.float_to_time(attendance.worked_hours))+' - '+str(count)+')', format5)
 			wk_hr=timedelta(hours=attendance.worked_hours)
-			bk_hr=count+timedelta(hours=1)
+			if attendance.employee_id.location_id.detect_lunch == True:
+				if any(x.check_out.time() > time(13,0) and x.check_out.time() < time(14,0) for x in attendance.line_ids) and any(x.check_in.time() > time(13,0) and x.check_in.time() < time(14,0) for x in attendance.line_ids):
+					bk_hr=count
+				else:
+					bk_hr=count+timedelta(hours=1)
+			else:
+				bk_hr=count
 			sheet.write(i+2, 3, str(wk_hr-bk_hr), format6)
 			fp = BytesIO()
 			workbook.save(fp)     

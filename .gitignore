@@ -1,0 +1,13 @@
+# .gitignore
+
+# Pyhon byte-compiled / optimized files
+__pycache__/
+*.py[cod]
+*$py.class
+
+
+// settings.json
+
+"files.exclude": {
+     "**/__pycache__": true
+}

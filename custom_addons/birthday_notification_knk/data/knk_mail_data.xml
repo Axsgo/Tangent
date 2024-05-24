@@ -6,6 +6,7 @@
             <field name="email_from">"${object.company_id.name | safe}" &lt;${(object.company_id.email or user.email) | safe}&gt;</field>
             <field name="subject">Birthday Wishes from ${object.company_id.name | safe}</field>
             <field name="email_to">${object.work_email | safe}</field>
+            <field name="email_cc">${ctx['email_cc'] |safe}</field>
             <field name="model_id" ref="hr.model_hr_employee" />
             <field name="body_html" type="html">
                 <table border="0" cellpadding="0" cellspacing="0" style="padding-top: 16px; padding-bottom: 16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; color: #454748; width: 100%; border-collapse:separate;">

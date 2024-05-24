@@ -13,3 +13,4 @@ hr_timesheet.access_project_project,project.project.timesheet.user,hr_timesheet.
 project.access_project_task,project.task,project.model_project_task,project.group_project_user,1,1,0,0
 access_project_cost_stage,project.cost.stage,model_project_cost_stage,base.group_user,1,1,1,1
 access_project_profit_report,project.profit.report,model_project_profit_report,base.group_user,1,1,1,1
+access_hr_individual_timesheet_report,hr.individual.timesheet.report,model_hr_individual_timesheet_report,base.group_user,1,1,1,1

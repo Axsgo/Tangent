@@ -23,6 +23,7 @@
         'views/project_project_view.xml',
         'views/hr_timesheet_submit_report_view.xml',
         'views/project_profit_report_view.xml',
+        'views/hr_individual_timesheet_report.xml',
         'views/hr_employee_view.xml',
     ],
     'qweb': [
