@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
 	<!-- Daily scheduler -->
-    <record id="hr_attendance_daily_alert_scheduler" model="ir.cron">
+    <!--<record id="hr_attendance_daily_alert_scheduler" model="ir.cron">
         <field name="name">Attendance Daily Alert Scheduler</field>
         <field name="model_id" ref="hr.model_hr_employee"/>
         <field name="state">code</field>
@@ -35,10 +35,10 @@
         </field>
         <field name="lang">${object.user_id.lang}</field>
         <field name="auto_delete" eval="True"/>
-    </record>
+    </record>-->
 
     <!-- Weekly scheduler -->
-    <record id="hr_attendance_weekly_alert_scheduler" model="ir.cron">
+    <!--<record id="hr_attendance_weekly_alert_scheduler" model="ir.cron">
         <field name="name">Attendance Weekly Alert Scheduler</field>
         <field name="model_id" ref="hr.model_hr_employee"/>
         <field name="state">code</field>
@@ -72,10 +72,10 @@
         </field>
         <field name="lang">${object.user_id.lang}</field>
         <field name="auto_delete" eval="True"/>
-    </record>
+    </record>-->
 
         <!-- Monthly scheduler -->
-    <record id="hr_attendance_monthly_alert_scheduler" model="ir.cron">
+    <!--<record id="hr_attendance_monthly_alert_scheduler" model="ir.cron">
         <field name="name">Attendance Monthly Alert Scheduler</field>
         <field name="model_id" ref="hr.model_hr_employee"/>
         <field name="state">code</field>
@@ -149,7 +149,7 @@
         </field>
         <field name="lang">${object.user_id.lang}</field>
         <field name="auto_delete" eval="True"/>
-    </record>
+    </record>-->
 
     <record id="ax_manager_timsheet_alert_scheduler" model="ir.cron">
         <field name="name">Manager Timesheet Alert Scheduler</field>

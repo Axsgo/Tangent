@@ -9,6 +9,7 @@
     'data': [
     'ir.model.access.csv',
     'ax_attendance_view.xml',
+    'ax_employee_view.xml',
     'ax_attendance_permission.xml',
     ],
     'depends': ['base','hr','hr_attendance','ax_base','ax_groups','sttl_timesheet_calendar'],

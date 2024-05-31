@@ -158,6 +158,11 @@ class AxAttendance(models.Model):
 class Employee(models.Model):
 	_inherit = "hr.employee"
 
+	def float_to_time(self,float_value):
+		hours = int(float_value)
+		minutes = int(round((float_value - hours) * 60))
+		return f"{hours:02d}:{minutes:02d}"
+
 	def _employee_weekly_alert_timesheet_attendance(self):	
 		today = datetime.now().date()
 		if today.weekday() == 0:
@@ -173,7 +178,8 @@ class Employee(models.Model):
 							'email_from':self.env.company.erp_email,
 							'today':start_date,
 							'last_week':last_date,
-							'com_work_hrs':self.env.company.attend_work_hrs
+							'com_work_hrs':self.float_to_time(self.env.company.attend_work_hrs),
+							'act_work_hrs': self.float_to_time(sum(attendance_ids.mapped('actual_hours'))),
 						}
 						template = self.env.ref('ax_attendance.email_template_employee_weekly_attendance_timesheet_alert')
 						template.with_context(context).send_mail(emp.id, force_send=True)
@@ -194,7 +200,8 @@ class Employee(models.Model):
 		    			'email_to':emp.work_email,
 						'email_from':self.env.company.erp_email,
 						'month':previous_month.strftime("%B"),
-						'com_work_hrs':self.env.company.attend_work_hrs
+						'com_work_hrs':self.env.company.attend_work_hrs,
+						'act_work_hrs':self.float_to_time(sum(attendance_ids.mapped('actual_hours'))),
 					}
 					template = self.env.ref('ax_attendance.email_template_employee_monthly_attendance_timesheet_alert')
 					template.with_context(context).send_mail(emp.id, force_send=True)

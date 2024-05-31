@@ -92,7 +92,7 @@ class AxExpiryAlerts(models.Model):
 							alert_date = data[0][res.field_id.name]
 						if datetime.now().date() == alert_date:
 							email_to = ''
-							if res.email_to_user_id.model_id.model == 'hr.employee':
+							if res.email_to_user_id.relation == 'hr.employee':
 								emp_id = line.read([res.email_to_user_id.name])[0][res.email_to_user_id.name][0]
 								emp_id = self.env['hr.employee'].browse(int(emp_id))
 								user_id = emp_id.user_id
@@ -115,5 +115,5 @@ class AxExpiryAlerts(models.Model):
 									'expiry_date':data[0][res.field_id.name],
 									'doc_no':line.name,
 								}
-								template = self.env['ir.model.data'].get_object('acc_masters', 'email_template_acc_expiry_alerts')
+								template = self.env['ir.model.data'].get_object('ax_expiry_alert', 'email_template_ax_expiry_alerts')
 								self.env['mail.template'].browse(template.id).with_context(context).send_mail(res.id,force_send=True)

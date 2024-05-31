@@ -316,7 +316,7 @@
 	                <p style="margin: 0px; padding: 0px; font-size: 13px;">
 	                	Dear <b>${object.display_name}</b>,
 	                    <br/><br/>
-						Kindly note that your daily average time inside office for the week starting from <b>${ctx['last_week'].strftime("%d/%b/%Y")}</b> to <b>${ctx['today'].strftime("%d/%b/%Y")}</b> is less than required hours (<b>${ctx['com_work_hrs']}</b> hrs).<br/> 
+						Kindly note that your daily average time inside office for the week starting from <b>${ctx['last_week'].strftime("%d/%b/%Y")}</b> to <b>${ctx['today'].strftime("%d/%b/%Y")}</b> is (<b>${ctx['act_work_hrs']}</b> hrs) is less than required hours (<b>${ctx['com_work_hrs']}</b> hrs).<br/> 
 						Please make sure you manage this lose hours in the coming days so that you maintain a monthly average of <b>${ctx['com_work_hrs']}</b> hrs per day.<br/>
 						Kindly check the daily average report sent by the system to you directly for understanding your daily time attendance.<br/><br/>
 						We look forward for your support in this regards,<br/><br/>
@@ -351,7 +351,7 @@
 	                <p style="margin: 0px; padding: 0px; font-size: 13px;">
 	                	Dear <b>${object.display_name}</b>,
 	                    <br/><br/>
-	                    Kindly note that your daily average time inside office for the month of <b>${ctx['month']}</b> is less than required hours (<b>${ctx['com_work_hrs']}</b> hrs).<br/>
+	                    Kindly note that your daily average time inside office for the month of <b>${ctx['month']}</b> is (<b>${ctx['act_work_hrs']}</b> hrs) is less than required hours (<b>${ctx['com_work_hrs']}</b> hrs).<br/>
 	                    Please make sure you manage this lose hours in the coming months so that you maintain a monthly average of <b>${ctx['com_work_hrs']}</b> hrs per day.<br/>
 						Kindly check the daily average report sent by the system to you directly for understanding your daily time attendance.<br/><br/>
 						We look forward for your support in this regards,<br/><br/>

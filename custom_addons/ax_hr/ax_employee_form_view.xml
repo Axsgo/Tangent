@@ -21,6 +21,16 @@
             <xpath expr="//div[@class='oe_title']/h1[1]/a[1]" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
+            <field name="passport_id" position="after">
+                <field name="passport_expire"/>
+            </field>
+            <field name="permit_no" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+            <field name="visa_expire" position="after">
+                <field name="permit_no" string="Labour Card No"/>
+                <field name="permit_expire"/>
+            </field>
         </field>
     </record>
 </odoo>

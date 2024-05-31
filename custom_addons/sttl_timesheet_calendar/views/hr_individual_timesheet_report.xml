@@ -7,8 +7,13 @@
 			<form>
 				<group>
 					<group>
+						<field name="report_type" options="{'horizontal':True}" widget="radio" required='1'/>
+					</group>
+					<group></group>
+					<group>
 						<field name="from_date" required='1'/>
-						<field name="employee_id" required='1' options="{'no_open':True,'no_create':True}"/>
+						<field name="project_id" attrs="{'required':[('report_type','=','project')],'invisible':[('report_type','!=','project')]}"  options="{'no_open':True,'no_create':True}"/>
+						<field name="employee_id" attrs="{'required':[('report_type','=','employee')],'invisible':[('report_type','!=','employee')]}" options="{'no_open':True,'no_create':True}"/>
 					</group>
 					<group>
 						<field name="to_date" required='1'/>
@@ -28,7 +33,7 @@
 	</record>
 
 	<record id="action_hr_individual_timesheet_report" model="ir.actions.act_window">
-		<field name="name">Individual Timesheet Report</field>
+		<field name="name">Timesheet Report</field>
 		<field name="res_model">hr.individual.timesheet.report</field>
 		<field name="type">ir.actions.act_window</field>
 		<field name="view_mode">form</field>
@@ -37,7 +42,7 @@
 	</record>
 
 	<menuitem id="menu_hr_individual_timesheet_report"
-                  name="Individual Timesheet Report"
+                  name="Timesheet Report"
                   action="action_hr_individual_timesheet_report"
                   parent="hr_timesheet.menu_timesheets_reports"
                   sequence="69"
