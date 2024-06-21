@@ -40,7 +40,7 @@
                                                         <div>
                                                             <p>Dear ${object.name},</p>
                                                             <p>Happy Birthday..!</p>
-                                                            <p>Wishing you a very very Happy Birthday.</p>
+                                                            <p>Wishing you a very Happy Birthday.</p>
                                                             <p>Hope you have a great year ahead. Stay Healthy, Stay Happy &amp; Stay Safe.</p>
                                                             <br />
                                                             <p>Thanks,</p>
@@ -127,7 +127,7 @@
                                                         <div>
                                                             <p>Dear ${object.name},</p>
                                                             <p>Happy Birthday..!</p>
-                                                            <p>Wishing you a very very Happy Birthday.</p>
+                                                            <p>Wishing you a very Happy Birthday.</p>
                                                             <p>Hope you have a great year ahead. Stay Healthy, Stay Happy &amp; Stay Safe.</p>
                                                             <br />
                                                             <p>Thanks,</p>

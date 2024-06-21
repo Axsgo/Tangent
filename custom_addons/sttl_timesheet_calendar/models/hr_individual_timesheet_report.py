@@ -1,6 +1,7 @@
 from odoo import fields,api,models
 import xlwt,base64
 from datetime import datetime, timedelta
+from odoo.exceptions import UserError
 
 class IndividualTimesheet(models.TransientModel):
 	_name = "hr.individual.timesheet.report"

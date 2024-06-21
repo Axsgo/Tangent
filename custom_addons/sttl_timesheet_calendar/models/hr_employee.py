@@ -35,7 +35,7 @@ class HREmployee(models.Model):
 		return f"{hours:02d}:{minutes:02d}"
 
 	def _entry_employee_timesheet_daily_alert(self):
-		employee_ids = self.env["hr.employee"].search([('active','=',True)])
+		employee_ids = self.env["hr.employee"].search([('active','=',True),('not_required','=',False)])
 		sterday = datetime.now().date() - relativedelta(days=1)
 		for emp in employee_ids:
 			leave_day = emp.get_unusual_days_emp(emp.resource_calendar_id,sterday,sterday)

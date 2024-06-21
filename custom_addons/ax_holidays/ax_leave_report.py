@@ -35,6 +35,7 @@ class AxLeaveRegister(models.TransientModel):
 
     dept_id = fields.Many2one('hr.department', 'Department Wise')
     employee_ids = fields.Many2many('hr.employee', string='Employee Wise', required=True)
+    leave_type_ids = fields.Many2many('hr.leave.type', string='Leave Type', required=True)
     start_date = fields.Date('Start Date', required=True)
     end_date = fields.Date('End Date', required=True)
     excel_file = fields.Binary(string='Report File')
@@ -59,9 +60,10 @@ class AxLeaveRegister(models.TransientModel):
         format1 = xlwt.easyxf('font:bold True,name Calibri;align: horiz center;borders: left thin, right thin, top thin, bottom thin;')
         format2 = xlwt.easyxf('font:name Calibri;align: horiz right;borders: left thin, right thin, top thin, bottom thin;')
         format3 = xlwt.easyxf('font:bold True,name Calibri;align: horiz left;borders: left thin, right thin, top thin, bottom thin;')
+        format4 = xlwt.easyxf('pattern: pattern solid,fore-colour pink;font:name Calibri;align: horiz right;borders: left thin, right thin, top thin, bottom thin;')
         col1=1;col2=3
         sheet.col(0).width = int(40*260)
-        for lt in self.env['hr.leave.type'].search([],order='id asc'):
+        for lt in self.env['hr.leave.type'].search([('id','=',self.leave_type_ids.ids)],order='id asc'):
             sheet.write_merge(0, 0, col1, col2, lt.name, format1)
             sheet.write(1, col1, 'Days', format1)
             col1+=1
@@ -74,16 +76,28 @@ class AxLeaveRegister(models.TransientModel):
         for emp in self.employee_ids:
             col1=1;col2=3
             sheet.write(row, 0, emp.name, format3)
-            for leave_type in self.env['hr.leave.type'].search([],order='id asc'):
+            for leave_type in self.env['hr.leave.type'].search([('id','=',self.leave_type_ids.ids)],order='id asc'):
                 leave_full = sum(self.env['hr.leave'].search([('employee_id','=',emp.id),('request_date_from','>=',self.start_date),('request_date_to','<=',self.end_date),('request_unit_half', '=', False),('request_unit_hours', '=', False),('state', '=', 'validate'),('holiday_status_id', '=', leave_type.id)]).mapped('number_of_days'))
                 leave_half = sum(self.env['hr.leave'].search([('employee_id','=',emp.id),('request_date_from','>=',self.start_date),('request_date_to','<=',self.end_date),('request_unit_half', '=', True),('state', '=', 'validate'),('holiday_status_id', '=', leave_type.id)]).mapped('number_of_days'))
                 leave_permission = sum(self.env['hr.leave'].search([('employee_id','=',emp.id),('request_date_from','>=',self.start_date),('request_date_to','<=',self.end_date),('request_unit_hours', '=', True),('state', '=', 'validate'),('holiday_status_id', '=', leave_type.id)]).mapped('number_of_hours_display'))
-                sheet.write(row, col1, leave_full, format2)
-                col1+=1
-                sheet.write(row, col1, leave_half, format2)
-                col1+=1
-                sheet.write(row, col1, leave_permission, format2)
-                col1+=1;col2+=3
+                if leave_full > 0:
+                    sheet.write(row, col1, leave_full, format4)
+                    col1+=1
+                else:
+                    sheet.write(row, col1, leave_full, format2)
+                    col1+=1
+                if leave_half > 0:
+                    sheet.write(row, col1, leave_half, format4)
+                    col1+=1
+                else:
+                    sheet.write(row, col1, leave_half, format2)
+                    col1+=1
+                if leave_permission > 0:
+                    sheet.write(row, col1, leave_permission, format4)
+                    col1+=1;col2+=3
+                else:
+                    sheet.write(row, col1, leave_permission, format2)
+                    col1+=1;col2+=3
             row+=1
         fp = BytesIO()
         workbook.save(fp)

@@ -77,39 +77,39 @@ class Employee(models.Model):
  # 					}
  # 					template = self.env['ir.model.data'].get_object('ax_attendance', 'email_template_weekly_attendance_alert')
  # 					self.env['mail.template'].browse(template.id).with_context(context).send_mail(emp.id,force_send=True)
- #
- # def _alert_monthly_attendance(self):
- # 	today = fields.date.today()
- # 	previous_month = date_utils.subtract(today, months=1)
- # 	last_day = calendar.monthrange(previous_month.year,previous_month.month)[1]
- # 	start_date = previous_month.replace(day=1, month=previous_month.month, year=previous_month.year)
- # 	last_date = previous_month.replace(day=last_day, month=previous_month.month, year=previous_month.year)
- # 	parent_ids = self.env['hr.employee'].search([]).mapped('parent_id')
- # 	for parent in parent_ids:
- # 		emp_list = []
- # 		employee_ids = self.env['hr.employee'].search([('parent_id','=',parent.id)])
- # 		for emp in employee_ids:
- # 			emp_dict = {};att_list = []
- # 			attend_ids = self.env['hr.attendance'].search([('employee_id','=',emp.id),('check_in','>=',start_date),
- # 						('check_out','<',last_date)]).filtered(lambda a: a.actual_hours < emp.company_id.attend_work_hrs)
- # 			for att in attend_ids:
- # 				att_dict = {'date': att.check_in.date(),'hour': self.float_to_time(att.actual_hours)}
- # 				att_list.append(att_dict)
- # 			if att_list:
- # 				emp_dict['emp'] = emp.name
- # 				emp_dict['less_avg'] = att_list
- # 				emp_list.append(emp_dict)
- # 		if emp_list:
- # 			context = {
- # 				'name':parent.name,
- # 				'actual_time':self.float_to_time(emp.company_id.attend_work_hrs),
- # 				'email_to':parent.work_email,
- # 				'email_from':self.env.company.erp_email,
- # 				'emp_list':emp_list
- # 			}
- # 			template = self.env['ir.model.data'].get_object('ax_attendance', 'email_template_monthly_attendance_alert')
- # 			self.env['mail.template'].browse(template.id).with_context(context).send_mail(emp.id,force_send=True)
- #
+ 
+	def _alert_monthly_attendance(self):
+		today = fields.date.today()
+		previous_month = date_utils.subtract(today, months=1)
+		last_day = calendar.monthrange(previous_month.year,previous_month.month)[1]
+		start_date = previous_month.replace(day=1, month=previous_month.month, year=previous_month.year)
+		last_date = previous_month.replace(day=last_day, month=previous_month.month, year=previous_month.year)
+		parent_ids = self.env['hr.employee'].search([]).mapped('parent_id')
+		for parent in parent_ids:
+			emp_list = []
+			employee_ids = self.env['hr.employee'].search([('parent_id','=',parent.id)])
+			for emp in employee_ids:
+				emp_dict = {};att_list = []
+				attend_ids = self.env['hr.attendance'].search([('employee_id','=',emp.id),('check_in','>=',start_date),
+							('check_out','<',last_date)]).filtered(lambda a: a.actual_hours < emp.company_id.attend_work_hrs)
+				for att in attend_ids:
+					att_dict = {'date': att.check_in.date(),'hour': self.float_to_time(att.actual_hours)}
+					att_list.append(att_dict)
+				if att_list:
+					emp_dict['emp'] = emp.name
+					emp_dict['less_avg'] = att_list
+					emp_list.append(emp_dict)
+			if emp_list:
+				context = {
+					'name':parent.name,
+					'actual_time':self.float_to_time(emp.company_id.attend_work_hrs),
+					'email_to':parent.work_email,
+					'email_from':self.env.company.erp_email,
+					'emp_list':emp_list
+				}
+				template = self.env['ir.model.data'].get_object('ax_attendance', 'email_template_monthly_attendance_alert')
+				self.env['mail.template'].browse(template.id).with_context(context).send_mail(emp.id,force_send=True)
+
  # def _employee_weekly_alert_timesheet_attendance(self):	
  # 	today = datetime.now().date()
  # 	group_id = self.env.ref('ax_groups.admin_user_group')
@@ -161,7 +161,7 @@ class Employee(models.Model):
  # 			report_id.unlink()
  #
  # def _entry_employee_timesheet_daily_alert(self):
- # 	employee_ids = self.env["hr.employee"].search([('active','=',True)])
+ # 	employee_ids = self.env["hr.employee"].search([('active','=',True),('not_required','=',False)])
  # 	sterday = datetime.now().date() - relativedelta(days=1)
  # 	for emp in employee_ids:
  # 		leave_day = emp.get_unusual_days_emp(emp.resource_calendar_id,sterday,sterday)
@@ -203,7 +203,7 @@ class Employee(models.Model):
 			self.env.company.timesheet_manager_nxt_date = nxt_date + relativedelta(days=self.env.company.timesheet_manager_alert)
 			if parent_ids:
 				for parent in parent_ids:
-					employee_ids = self.env["hr.employee"].search([('parent_id','child_of',parent.id)])
+					employee_ids = self.env["hr.employee"].search([('parent_id','child_of',parent.id),('not_required','=',False)])
 					emp_ids = []
 					if employee_ids:
 						for emp in employee_ids:

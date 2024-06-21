@@ -16,6 +16,7 @@
 							<group>
 							    <field name="start_date"/>
 							    <field name="end_date"/>
+							    <field name="leave_type_ids" widget="many2many_tags"/>
 							</group>
                       	</group>
                     </sheet>
