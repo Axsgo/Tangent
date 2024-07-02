@@ -17,7 +17,8 @@ class Company(models.Model):
 	absent_manager_alert = fields.Integer("No of days interval for sending email notification to manager",default=15)
 	absent_manager_nxt_date = fields.Date("Next Date")
 	#attendance
-	attend_work_hrs = fields.Float("Login Hours(HH:MM)",default=0)
+	attend_work_hrs = fields.Float("Login Hours(HH:MM)",default=9)
+	company_start_time = fields.Float("Company Start Time(HH:MM)",default=9)
 
 	@api.onchange("timesheet_manager_alert")
 	def update_timesheet_manager_nxt_date(self):

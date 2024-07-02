@@ -43,8 +43,8 @@
                                                             <p>Wishing you a very Happy Birthday.</p>
                                                             <p>Hope you have a great year ahead. Stay Healthy, Stay Happy &amp; Stay Safe.</p>
                                                             <br />
-                                                            <p>Thanks,</p>
-                                                            <p>${object.company_id.name}</p>
+                                                            <p>Best regards,</p>
+                                                            <p>Everyone from office</p>
                                                             <br /><br />
                                                         </div>
                                                     </td>
@@ -130,8 +130,8 @@
                                                             <p>Wishing you a very Happy Birthday.</p>
                                                             <p>Hope you have a great year ahead. Stay Healthy, Stay Happy &amp; Stay Safe.</p>
                                                             <br />
-                                                            <p>Thanks,</p>
-                                                            <p>${object.company_id.name}</p>
+                                                            <p>Best regards,</p>
+                                                            <p>Everyone from office</p>
                                                             <br /><br />
                                                         </div>
                                                     </td>

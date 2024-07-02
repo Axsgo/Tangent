@@ -98,21 +98,13 @@
                 Dear ${ctx['name']},
                 <br></br>
                 <br></br>
-            	We would like to bring to your attention that the following employees have not ${ctx['actual_time']}hours, their attendance on the listed days.
+            	We would like to bring to your attention that the following employees have not monthly average ${ctx['actual_time']} hours.
             	<br/><br/>
             	% set emp_list = ctx['emp_list']
             	<ol type="1">
             	% for emp in emp_list:
             		<li>
-            			<h4>${emp['emp']}</h4>
-            			% set dates = emp['less_avg']
-            			%if dates:
-            				<ul type="1">
-            					% for date in dates:
-            						<li>${date['date']} - ${date['hour']}</li>
-            					%endfor
-            				</ul>
-            			%endif
+            			<h4>${emp['name']} - ${emp['avg']}</h4>
             		</li>
             	% endfor
                 </ol>
@@ -157,7 +149,7 @@
         <field name="state">code</field>
         <field name="code">model._entry_manager_timesheet_alert()</field>
         <field name="interval_number">1</field>
-        <field name="interval_type">days</field>
+        <field name="interval_type">months</field>
         <field name="numbercall">-1</field>
         <field name="active">True</field>
         <field name="doall" eval="False"/>

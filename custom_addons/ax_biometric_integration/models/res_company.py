@@ -72,12 +72,12 @@ class ResCompany(models.Model):
                     first_check_in = min(result_set, key=lambda x: x[1])
                     last_check_out = max(result_set, key=lambda x: x[2])
                     self.env['hr.attendance'].create({'fetch_date':self.fetch_date,'employee_id':employee.id,'line_ids':lines,'check_in':first_check_in[1]- timedelta(hours=5.5),'check_out':last_check_out[2]- timedelta(hours=5.5)})
-                if employee.missing_count > 5:
-                    emails = ''
-                    group_id = self.env.ref('ax_groups.admin_user_group')
-                    emails+=",".join(group_id.users.mapped('login'))
-                    template = self.env.ref('ax_biometric_integration.email_template_manager_missing_count_alert')
-                    template.with_context({'email_to':employee.parent_id.work_email,'email_cc':emails,'email_from':self.erp_email}).send_mail(employee.id, force_send=True)
+                # if employee.missing_count > 5:
+                #     emails = ''
+                #     group_id = self.env.ref('ax_groups.admin_user_group')
+                #     emails+=",".join(group_id.users.mapped('login'))
+                #     template = self.env.ref('ax_biometric_integration.email_template_manager_missing_count_alert')
+                #     template.with_context({'email_to':employee.parent_id.work_email,'email_cc':emails,'email_from':self.erp_email}).send_mail(employee.id, force_send=True)
             self.fetch_date = self.fetch_date + relativedelta(days=1)
             con.close()
             cursor.close()

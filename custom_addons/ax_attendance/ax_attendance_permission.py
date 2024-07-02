@@ -1,5 +1,5 @@
 from odoo import fields,api,models,_
-from datetime import datetime,time
+from datetime import datetime,time,date,timedelta
 from pytz import UTC
 from dateutil.rrule import rrule, DAILY
 from odoo.exceptions import UserError
@@ -24,22 +24,56 @@ class AxAttendancePermission(models.Model):
 
 	name = fields.Char('Name')
 	employee_id = fields.Many2one('hr.employee', "Employee", domain=_domain_employee_id, required=True)
-	date = fields.Date(string='Attendance Date', required=True, tracking=True)
+	date = fields.Date(string='Attendance Date', default=date.today(), required=True, tracking=True)
 	check_in = fields.Datetime("Check In", required=True)
 	check_out = fields.Datetime("Check Out", required=True)
+	start_time = fields.Float("Start Time (HH:MM)")
+	start_meridiem = fields.Selection([('AM','AM'),('PM','PM')],"Start Meridiem",default='AM')
+	end_time = fields.Float("End Time (HH:MM)")
+	end_meridiem = fields.Selection([('AM','AM'),('PM','PM')],"End Meridiem",default='PM')
+	start = fields.Float("Start",compute='_get_railway_time')
+	end = fields.Float("End",compute='_get_railway_time')
 	comments = fields.Text('Comments')
 	state = fields.Selection([('applied','Applied'),('approved','Approved'),('rejected','Rejected')],'State',default='applied')
 	
-	@api.onchange('check_in','check_out')
-	def _onchange_check_in_out(self):
-		self.date = self.check_in.date()
+	@api.depends('start_time','end_time','start_meridiem','end_meridiem')
+	def _get_railway_time(self):
+		for rec in self:
+			if rec.start_time and rec.start_meridiem:
+				if rec.start_meridiem == 'PM':
+					start = rec.start_time+12
+					if start >= 24:
+						rec.start = rec.start_time
+						rec.check_in = (datetime.combine(rec.date, time(0,0,0))+timedelta(hours=rec.start_time-5.5))
+					else:
+						rec.start = start
+						rec.check_in = (datetime.combine(rec.date, time(0,0,0))+timedelta(hours=start-5.5))
+				else:
+					rec.start = rec.start_time
+					rec.check_in = (datetime.combine(rec.date, time(0,0,0))+timedelta(hours=rec.start_time-5.5))
+			else:
+				rec.start = 0
+			if rec.end_time and rec.end_meridiem:
+				if rec.end_meridiem == 'PM':
+					end = rec.end_time+12
+					if end >= 24:
+						rec.end = rec.end_time
+						rec.check_out = (datetime.combine(rec.date, time(0,0,0))+timedelta(hours=rec.end_time-5.5))
+					else:
+						rec.end = end
+						rec.check_out = (datetime.combine(rec.date, time(0,0,0))+timedelta(hours=end-5.5))
+				else:
+					rec.end = rec.end_time
+					rec.check_out = (datetime.combine(rec.date, time(0,0,0))+timedelta(hours=rec.end_time-5.5))
+			else:
+				rec.end = 0
 	
 	@api.model_create_multi
 	def create(self, vals_list):
 		lines = super(AxAttendancePermission, self).create(vals_list)
 		for res in lines:
-			if res.check_in.date() != res.check_out.date():
-				raise UserError(_("Check In and Check Out dates should be the same"))
+			if res.check_in > res.check_out:
+				raise UserError(_("Check Out time should be the greater then Check In time"))
 			if self.env['hr.leave'].search([('employee_id','=',res.employee_id.id),('request_date_from','<=',res.date),('request_date_to','>=',res.date)]):
 				raise UserError(_("As of this date, you have already applied for the leave"))
 			res.name = res.employee_id.name
@@ -47,12 +81,28 @@ class AxAttendancePermission(models.Model):
 	
 	def write(self, vals):
 		rec = super(AxAttendancePermission, self).write(vals)
-		if self.check_in.date() != self.check_out.date():
-			raise UserError(_("Check In and Check Out dates should be the same"))
+		if self.check_in > self.check_out:
+			raise UserError(_("Check Out time should be the greater then Check In time"))
 		if self.env['hr.leave'].search([('employee_id','=',self.employee_id.id),('request_date_from','<=',self.date),('request_date_to','>=',self.date)]):
 			raise UserError(_("As of this date, you have already applied for the leave"))
 		return rec
 	
+	def entry_apply(self):
+		context = {
+		    'email_to':self.employee_id.parent_id.work_email,
+		    'url':self.get_portal_url(),
+			'email_from':self.env.company.erp_email,
+			}
+		template = self.env.ref('ax_attendance.email_template_attendance_permission')
+		template.with_context(context).send_mail(self.id, force_send=True)
+		return {
+	            'name': _("Attendance Permission"),
+	            'res_model': 'hr.attendance.permission',
+	            'view_mode': 'calendar,tree,form',
+	            'view_type': 'calendar',
+	            'type': 'ir.actions.act_window',
+	        }
+
 	def entry_approve(self):
 		if self.env.user.id == self.employee_id.user_id.id:
 			raise UserError(_('Only your manager can approve your request.'))
@@ -93,4 +143,8 @@ class AxAttendancePermission(models.Model):
 
 		works = {d[0].date() for d in calendar._work_intervals_batch(dfrom, dto)[False]}
 		return {fields.Date.to_string(day.date()): (day.date() not in works) for day in rrule(DAILY, dfrom, until=dto)}
+	
+	def get_portal_url(self):
+		portal_link = str(self.env['ir.config_parameter'].sudo().get_param('web.base.url'))+"/web#id="+str(self.id)+"&model=hr.attendance.permission&view_type=form"
+		return portal_link
 	

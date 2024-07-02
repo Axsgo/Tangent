@@ -31,6 +31,21 @@
                 <field name="permit_no" string="Labour Card No"/>
                 <field name="permit_expire"/>
             </field>
+            <xpath expr="//field[@name='private_email']" position="attributes">
+                <attribute name="readonly">0</attribute>
+            </xpath>
+            <xpath expr="//field[@name='phone']" position="attributes">
+                <attribute name="readonly">0</attribute>
+            </xpath>
+            <xpath expr="//page[@name='personal_information']" position="attributes">
+                <attribute name="string">Personal Information</attribute>
+            </xpath>
+            <xpath expr="//field[@name='emergency_contact']" position="attributes">
+                <attribute name="string">Emergency Contact Name</attribute>
+            </xpath>
+            <field name="emergency_phone" position="after">
+                <field name="emergency_mobile"/>
+            </field>
         </field>
     </record>
 </odoo>

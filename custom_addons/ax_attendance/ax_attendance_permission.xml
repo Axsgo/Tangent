@@ -10,8 +10,8 @@
 	            <tree string="Attendance Permission">
 	                <field name="employee_id"/>
 	                <field name="date"/>
-	                <field name="check_in"/>
-	                <field name="check_out"/>
+	                <field name="start_time"/>
+	                <field name="end_time"/>
 	                <field name="state"/>
 	            </tree>
 	        </field>
@@ -23,6 +23,7 @@
 	        <field name="arch" type="xml">
 	            <form string="Attendance Permission">
 					<header>
+						<button name = "entry_apply" type = "object" string = "Apply" states = "applied"/>
 						<button name = "entry_approve" type = "object" string = "Approve" states = "applied" 
 							class = "oe_highlight" groups="hr.group_hr_manager"/>
 						<button name = "entry_cancel" type = "object" string = "Cancel" states = "applied"/>
@@ -31,14 +32,30 @@
 	                <sheet>
 	                    <group>
 							<group>
-		                        <field name="employee_id" attrs="{'readonly':[('state','!=','applied')]}"/>
-		                        <field name="date" invisible="1"/>
-		                        <field name="check_in" attrs="{'readonly':[('state','!=','applied')]}"/>
-		                        <field name="check_out" attrs="{'readonly':[('state','!=','applied')]}"/>
-		                        <field name="comments" attrs="{'readonly':[('state','!=','applied')]}"/>
+		                        <field name="employee_id" attrs="{'readonly':[('state','!=','applied')]}" readonly="1"/>
+		                        <field name="check_in" invisible="1"/>
+		                        <field name="check_out" invisible="1"/>
+		                        <label for="start_time"/>
+	                            <div class="o_row">
+	                                <field name="start_time" required='1' widget="float_time" attrs="{'readonly':[('state','!=','applied')]}"/>
+	                                <field name="start_meridiem" required='1' attrs="{'readonly':[('state','!=','applied')]}"/>
+	                            </div>
+	                            <field name="start" widget="float_time" invisible="1"/>
 		               		</group>
+		               		<group>
+								<field name="date" readonly="1"/>  
+								<label for="end_time"/>
+	                            <div class="o_row">
+	                                <field name="end_time" required='1' widget="float_time"/>
+	                                <field name="end_meridiem" required='1'/>
+	                            </div>
+	                            <field name="end" widget="float_time" invisible="1"/>
+							</group>
+							<field name="comments" attrs="{'readonly':[('state','!=','applied')]}"/>
 	                    </group>
 	                </sheet>
+	                <footer>
+					</footer>
 	            </form>
 	        </field>
 	    </record>
@@ -52,7 +69,6 @@
 	                <filter string="My Permission" name="mypermission" domain="[('employee_id.user_id.id', '=', uid)]" />
 	                <separator/>
 	                <filter string="Check Out" name="check_in_filter" date="check_in" default_period="last_month"/>
-	                <filter string="No Check In" name="nocheckout" domain="[('check_in', '=', False)]" />
 	                <group expand="0" string="Group By">
 	                    <filter string="Employee" name="employee" context="{'group_by': 'employee_id'}"/>
 	                    <filter string="Check In" name="groupby_name" context="{'group_by': 'check_in'}"/>
@@ -67,7 +83,7 @@
 	        <field name="name">Attendance Permission</field>
 	        <field name="model">hr.attendance.permission</field>
 	        <field name="arch" type="xml">
-	            <calendar date_start="check_in" date_stop="check_out" string="Description" mode="month" color="employee_id" event_limit="5" event_open_popup="true" form_view_id="%(ax_attendance.hr_attendance_permission_form_view)d" quick_add="False" show_unusual_days="True" hide_time="True">
+	            <calendar date_start="date" date_stop="date" string="Description" mode="month" color="employee_id" event_limit="5" event_open_popup="true" form_view_id="%(ax_attendance.hr_attendance_permission_form_view)d" quick_add="False" show_unusual_days="True" hide_time="True">
 	            	<field name="employee_id" filters="1"/>
 	            	<field name="date"/>
 	            	<field name="check_in"/>
@@ -108,6 +124,31 @@
 	        <field name="model_id" ref="ax_attendance.model_hr_attendance_permission" />
 	        <field name="domain_force">['|',('employee_id.user_id', '=', user.id),('employee_id.parent_id.user_id', '=', user.id)]</field>
 	        <field name="groups" eval="[(4, ref('hr.group_hr_manager'))]" />
+	    </record>
+	    
+	    <record id="email_template_attendance_permission" model="mail.template">
+	        <field name="name">Attendance Log Permisson</field>
+	        <field name="model_id" ref="ax_attendance.model_hr_attendance_permission"/>
+	        <field name="email_from">${ctx['email_from'] |safe}</field>
+	        <field name="email_to">${ctx['email_to'] |safe}</field>
+	        <field name="subject">System Notification: Attendance Log Permisson</field>
+	        <field name="body_html" type="html">
+	            <div style="margin: 0px; padding: 0px;">
+	                <p style="margin: 0px; padding: 0px; font-size: 13px;">
+	                	Dear <b>${object.employee_id.parent_id.display_name}</b>,
+	                    <br/><br/>
+	                    Kindly check the attendence log permisson requset from ${object.employee_id.display_name}.
+	                    <br/><br/>
+	                    <a t-att-href="${ctx['url']}"
+		                    style="margin-left: 10px; background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;">
+		                    View
+		                </a>
+	                    <br/><br/>
+	                    Please note: This is an automated message, and there is no need to reply to this email.
+	                </p>
+	            </div>
+	        </field>
+	        <field name="auto_delete" eval="True"/>
 	    </record>
 	</data>
 </odoo>
