@@ -172,14 +172,18 @@ class Employee(models.Model):
 			for emp in emp_ids:
 				attendance_ids = self.env['hr.attendance'].search([('employee_id','=',emp.id),('fetch_date','>=',last_date),('fetch_date','<=',start_date)])
 				if attendance_ids:
-					if sum(attendance_ids.mapped('actual_hours')) < (7 * self.env.company.attend_work_hrs):
+					leave_count = 0
+					leave_days = emp.get_unusual_days_emp(emp.resource_calendar_id,last_date,start_date)
+					leave_count += list(leave_days.values()).count(False)
+					if sum(attendance_ids.mapped('actual_hours')) < (leave_count * self.env.company.attend_work_hrs):
+						avg=sum(attendance_ids.mapped('actual_hours'))/leave_count
 						context = {
 			    			'email_to':emp.work_email,
 							'email_from':self.env.company.erp_email,
 							'today':start_date,
 							'last_week':last_date,
 							'com_work_hrs':self.float_to_time(self.env.company.attend_work_hrs),
-							'act_work_hrs': self.float_to_time(sum(attendance_ids.mapped('actual_hours'))),
+							'act_work_hrs': self.float_to_time(avg),
 						}
 						template = self.env.ref('ax_attendance.email_template_employee_weekly_attendance_timesheet_alert')
 						template.with_context(context).send_mail(emp.id, force_send=True)
@@ -190,18 +194,21 @@ class Employee(models.Model):
 		last_day = calendar.monthrange(previous_month.year,previous_month.month)[1]
 		start_date = previous_month.replace(day=1, month=previous_month.month, year=previous_month.year)
 		last_date = previous_month.replace(day=last_day, month=previous_month.month, year=previous_month.year)
-		days = last_date-start_date
 		emp_ids = self.env['hr.employee'].search([])
 		for emp in emp_ids:
 			attendance_ids = self.env['hr.attendance'].search([('employee_id','=',emp.id),('fetch_date','>=',start_date),('fetch_date','<=',last_date)])
 			if attendance_ids:
-				if sum(attendance_ids.mapped('actual_hours')) < (days.days * self.env.company.attend_work_hrs):
+				leave_count = 0
+				leave_days = emp.get_unusual_days_emp(emp.resource_calendar_id,start_date,last_date)
+				leave_count += list(leave_days.values()).count(False)
+				if sum(attendance_ids.mapped('actual_hours')) < (leave_count * self.env.company.attend_work_hrs):
+					avg=sum(attendance_ids.mapped('actual_hours'))/leave_count
 					context = {
 		    			'email_to':emp.work_email,
 						'email_from':self.env.company.erp_email,
 						'month':previous_month.strftime("%B"),
 						'com_work_hrs':self.env.company.attend_work_hrs,
-						'act_work_hrs':self.float_to_time(sum(attendance_ids.mapped('actual_hours'))),
+						'act_work_hrs':self.float_to_time(avg),
 					}
 					template = self.env.ref('ax_attendance.email_template_employee_monthly_attendance_timesheet_alert')
 					template.with_context(context).send_mail(emp.id, force_send=True)

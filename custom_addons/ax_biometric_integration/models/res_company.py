@@ -71,7 +71,7 @@ class ResCompany(models.Model):
                             lines.append((0,0,{'check_in':result[1]- timedelta(hours=5.5),'check_out':result[2]- timedelta(hours=5.5)}))
                     first_check_in = min(result_set, key=lambda x: x[1])
                     last_check_out = max(result_set, key=lambda x: x[2])
-                    self.env['hr.attendance'].create({'fetch_date':self.fetch_date,'employee_id':employee.id,'line_ids':lines,'check_in':first_check_in[1]- timedelta(hours=5.5),'check_out':last_check_out[2]- timedelta(hours=5.5)})
+                    self.env['hr.attendance'].create({'fetch_date':self.fetch_date,'employee_id':employee.id,'line_ids':lines,'check_in':first_check_in[1]- timedelta(hours=5.5),'check_out':last_check_out[2]- timedelta(hours=5.5) if last_check_out[2].year!=1970 else last_check_out[1]- timedelta(hours=5.5)})
                 # if employee.missing_count > 5:
                 #     emails = ''
                 #     group_id = self.env.ref('ax_groups.admin_user_group')
